@@ -112,3 +112,13 @@ expect="$arg1"
 res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
+
+
+echo ""
+echo "1.9. Test common_path: returns paths with space"
+arg1="source dir/dir/subdir"
+arg2="source dir/dir/subdir"
+expect="$arg1"
+res=$(common_path "$arg1" "$arg2")
+echo "common_path \"$arg1\" \"$arg2\""
+assert "$res" "$expect"

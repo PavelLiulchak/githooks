@@ -13,16 +13,16 @@ common_path() {
     for path in "${paths[@]}"; do
       read -ra parts <<< "$path"
 
-      [[ "${parts[i]}" != "$segment" ]] && {
-        echo "${result[*]}" | tr ' ' '/'
+      if [[ "${parts[i]}" != "$segment" ]]; then
+        (IFS=/; echo "${result[*]}")
         return
-      }
+      fi
     done
 
     result+=("$segment")
   done
 
-  echo "${result[*]}" | tr ' ' '/'
+  (IFS=/; echo "${result[*]}")
 }
 
 # strips subpath to $2
