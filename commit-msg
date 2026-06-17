@@ -1,5 +1,9 @@
 #!/bin/bash
 
+pushd "$(dirname "$(which "$0")")" >/dev/null
+script_dir="$(pwd -P)"
+popd >/dev/null
+
 DEV_DIR="code"
 QA_DIR="tests"
 JIRA_PROJECT_KEY="PROJ"
@@ -9,10 +13,6 @@ COMMIT_MSG_FILE=$1
 # git config commit.cleanup may be set to print verbose info (additional info lines start with #), we cut them of.
 MSG=$(cat "$COMMIT_MSG_FILE" | sed '/^#/,$d')
 
-# You have to use symlink from <your project>/.git/hooks/prepare-commit-msg -> <this project>/prepare-commit-msg.sh.
-# Read link to locate <this project> and source helper functions scripts properly.
-script_path="$(readlink -f "$0")"
-script_dir="$(dirname "$script_path")"
 helper_functions_script="$script_dir/hooks-helper-functions.sh"
 
 if [[ ! -f "$helper_functions_script" ]]; then
