@@ -1,0 +1,49 @@
+#!/bin/bash
+
+DEV_DIR="code"
+QA_DIR="tests"
+JIRA_PROJECT_KEY="PROJ"
+
+COMMIT_MSG_FILE=$1
+
+# git config commit.cleanup may be set to print verbose info (additional info lines start with #), we cut them of.
+MSG=$(cat "$COMMIT_MSG_FILE" | sed '/^#/,$d')
+
+# You have to use symlink from <your project>/.git/hooks/prepare-commit-msg -> <this project>/prepare-commit-msg.sh.
+# Read link to locate <this project> and source helper functions scripts properly.
+script_path="$(readlink -f "$0")"
+script_dir="$(dirname "$script_path")"
+helper_functions_script="$script_dir/hooks-helper-functions.sh"
+
+if [[ ! -f "$helper_functions_script" ]]; then
+echo "$helper_functions_script is not found, nothing to source, exiting..."
+exit 1
+fi
+
+source $helper_functions_script
+
+mapfile -d '' -t FILES < <(git diff --cached --name-only -z)
+COMMON=$(common_path "${FILES[@]}")
+
+# I do this due to the project specific: QA_DIR - is a subdir of DEV_DIR.
+# You may use only normalization if they are located on the same level
+COMMON_STRIPPED=$(strip_path_before "$COMMON" "$QA_DIR")
+
+COMMON_NORMALIZED=$(normalize_path "$COMMON_STRIPPED")
+SCOPE=$(make_scope $COMMON_NORMALIZED $DEV_DIR $QA_DIR)
+
+# Jira ID
+BRANCH=$(git branch --show-current)
+JIRAID=$(get_jira_id_from_branch_name "$BRANCH" "$JIRA_PROJECT_KEY")
+
+if [[ -n "$SCOPE" && "$MSG" != "$SCOPE"* ]]; then
+    MSG="$SCOPE: $MSG"
+fi
+
+if [[ -n "$JIRAID" && "$MSG" != *"$JIRAID"* ]]; then
+    MSG="$MSG
+
+$JIRAID"
+fi
+
+echo "$MSG" > "$COMMIT_MSG_FILE"
