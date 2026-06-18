@@ -5,33 +5,18 @@ script_dir="$(pwd -P)"
 popd >/dev/null
 
 helper_functions_script="$script_dir/../hooks-helper-functions.sh"
-
 if [[ ! -f "$helper_functions_script" ]]; then
 echo "$helper_functions_script is not found, nothing to source, exiting..."
 exit 1
 fi
-
 source $helper_functions_script
 
-assert() {
-  res=$1
-  expect=$2
-
-  echo "res = $res"
-  echo "expect = $expect"
-
-  if [[ $res == $expect ]]; then
-    GREEN=$(tput setaf 2)
-    RESET=$(tput sgr0)
-
-    echo "${GREEN}Success${RESET}"
-  else
-    RED=$(tput setaf 1)
-    RESET=$(tput sgr0)
-
-    echo "${RED}Failed${RESET}"
-  fi
-}
+helper_tests_script="$script_dir/helpers_tests.sh"
+if [[ ! -f "$helper_tests_script" ]]; then
+echo "$helper_tests_script is not found, nothing to source, exiting..."
+exit 1
+fi
+source $helper_tests_script
 
 ## tests
 echo ""
