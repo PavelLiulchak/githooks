@@ -4,7 +4,7 @@ pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
 
-helper_functions_script="$script_dir/hooks-helper-functions.sh"
+helper_functions_script="$script_dir/../hooks-helper-functions.sh"
 
 if [[ ! -f "$helper_functions_script" ]]; then
 echo "$helper_functions_script is not found, nothing to source, exiting..."
