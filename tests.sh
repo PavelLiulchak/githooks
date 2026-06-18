@@ -122,3 +122,13 @@ expect="$arg1"
 res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
+
+
+echo ""
+echo "1.10. Test common_path: returns linux path in case windows path"
+arg1="source dir\dir\subdir1"
+arg2="source dir\dir\subdir2"
+expect="source dir/dir"
+res=$(common_path "$arg1" "$arg2")
+echo "common_path \"$arg1\" \"$arg2\""
+assert "$res" "$expect"

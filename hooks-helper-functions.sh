@@ -1,7 +1,13 @@
 #!/bin/bash
 
 common_path() {
-  local paths=("$@")
+  local paths=()
+
+  for path in "$@"; do
+    path="$(path_into_linux_path "$path")"
+    paths+=("$path")
+  done
+
   local IFS='/'
 
   read -ra firstPathBySegs <<< "${paths[0]}"
@@ -92,4 +98,11 @@ get_jira_id_from_branch_name() {
 [ -n "$JIRAID" ] && JIRAID=$(echo "$JIRAID" | sed -E "s/${JIRA_PROJECT_KEY}[-_]?([0-9]+)/${JIRA_PROJECT_KEY}-\1/")
 
 echo "$JIRAID"
+}
+
+path_into_linux_path() {
+  local path="$1"
+  path="${path//\\//}"
+
+  echo "$path"
 }
