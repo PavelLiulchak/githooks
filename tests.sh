@@ -95,20 +95,20 @@ assert "$res" "$expect"
 
 
 echo ""
-echo "1.7. Test common_path: returns non empty path"
+echo "1.7. Test common_path: returns empty path"
 arg1=""
 arg2="source_dir/dir/subdir"
-expect="$arg2"
+expect="$arg1"
 res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
 echo ""
-echo "1.8. Test common_path: returns non empty path (different args order)"
+echo "1.8. Test common_path: returns empty path (different args order)"
 arg1="source_dir/dir/subdir"
 arg2=""
-expect="$arg1"
+expect="$arg2"
 res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
