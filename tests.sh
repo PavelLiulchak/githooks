@@ -95,7 +95,16 @@ assert "$res" "$expect"
 
 
 echo ""
-echo "1.7. Test common_path: returns empty path"
+echo "1.7. Test common_path: returns paths with space"
+arg1="source dir/dir/subdir"
+arg2="source dir/dir/subdir"
+expect="$arg1"
+res=$(common_path "$arg1" "$arg2")
+echo "common_path \"$arg1\" \"$arg2\""
+assert "$res" "$expect"
+
+echo ""
+echo "1.8. Test common_path: returns empty path"
 arg1=""
 arg2="source_dir/dir/subdir"
 expect="$arg1"
@@ -105,7 +114,7 @@ assert "$res" "$expect"
 
 
 echo ""
-echo "1.8. Test common_path: returns empty path (different args order)"
+echo "1.9. Test common_path: returns empty path (different args order)"
 arg1="source_dir/dir/subdir"
 arg2=""
 expect="$arg2"
@@ -113,8 +122,9 @@ res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
+
 echo ""
-echo "1.9. Test common_path: returns empty path, several paths"
+echo "1.10. Test common_path: returns empty path, several paths"
 arg1="source_dir/dir/subdir1"
 arg2=""
 arg3="source_dir/dir/subdir2"
@@ -123,24 +133,15 @@ res=$(common_path "$arg1" "$arg2" "$arg3")
 echo "common_path \"$arg1\" \"$arg2\" \"$arg3\""
 assert "$res" "$expect"
 
+
 echo ""
-echo "1.10. Test common_path: returns empty path, several paths (different args order)"
+echo "1.11. Test common_path: returns empty path, several paths (different args order)"
 arg1=""
 arg2="source_dir/dir/subdir1"
 arg3="source_dir/dir/subdir2"
 expect="$arg1"
 res=$(common_path "$arg1" "$arg2" "$arg3")
 echo "common_path \"$arg1\" \"$arg2\" \"$arg3\""
-assert "$res" "$expect"
-
-
-echo ""
-echo "1.11. Test common_path: returns paths with space"
-arg1="source dir/dir/subdir"
-arg2="source dir/dir/subdir"
-expect="$arg1"
-res=$(common_path "$arg1" "$arg2")
-echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
