@@ -131,7 +131,16 @@ assert "$res" "$expect"
 
 
 echo ""
-echo "1.12. Test common_path: returns linux path in case windows path"
+echo "1.12. Test common_path: single argument"
+arg1="source_dir/dir/subdir"
+expect="$arg1"
+res=$(common_path "$arg1")
+echo "common_path \"$arg1\""
+assert "$res" "$expect"
+
+
+echo ""
+echo "1.13. Test common_path: returns linux path in case windows path"
 arg1="source dir\dir\subdir1"
 arg2="source dir\dir\subdir2"
 expect="source dir/dir"
