@@ -106,3 +106,49 @@ path_into_linux_path() {
 
   echo "$path"
 }
+
+rule_paths_into_linux_paths() {
+    local -n rules=$1
+    local -A normalized
+
+    for key in "${!rules[@]}"; do
+        normalized["$(path_into_linux_path "$key")"]="${rules[$key]}"
+    done
+
+    rules=()
+
+    for key in "${!normalized[@]}"; do
+        rules["$key"]="${normalized[$key]}"
+    done
+}
+
+get_labels() {
+  local -n rules=$1
+  local -n changed_files=$2
+
+  declare -A labels
+
+  for file in "${changed_files[@]}"; do
+    best_label=""
+    best_len=0
+
+    for rule in "${!rules[@]}"; do
+        # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
+        if [[ "$file" == "$rule" ]] || [[ "$file" == "$rule/"* ]]; then
+            len=${#rule}
+
+            if (( len > best_len )); then
+                best_len=$len
+                best_label="${rules[$rule]}"
+            fi
+        fi
+    done
+
+    if [[ -n "$best_label" ]]; then
+        labels["$best_label"]=1
+    fi
+        
+  done
+
+  echo "${!labels[@]}" | tr ' ' '\n' | sort | tr '\n' ' '
+}

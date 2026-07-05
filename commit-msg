@@ -1,12 +1,20 @@
 #!/bin/bash
 
+# Set us!
+JIRA_PROJECT_KEY="PROJ"
+# The rules paths are case sensitive
+declare -A RULES=(
+    ["code"]="DEV"
+    ["code/tests"]="QA"
+    ["code/autotests"]="QA"
+)
+
+# If you use Windows paths in the array declaration, script transforms the paths into Linux paths anyway.
+rule_paths_into_linux_paths RULES
+
 pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
-
-DEV_DIR="code"
-QA_DIR="tests"
-JIRA_PROJECT_KEY="PROJ"
 
 COMMIT_MSG_FILE=$1
 
