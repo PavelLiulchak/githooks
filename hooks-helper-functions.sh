@@ -79,12 +79,19 @@ path_into_linux_path() {
   echo "$path"
 }
 
-rule_paths_into_linux_paths() {
+array_keys_to_linux_paths_without_trailing_slashes() {
     local -n rules_local=$1
     local -A normalized_local
+    local original_key normalized_key
 
-    for key in "${!rules_local[@]}"; do
-        normalized_local["$(path_into_linux_path "$key")"]="${rules_local[$key]}"
+    for original_key in "${!rules_local[@]}"; do
+      normalized_key=$(path_into_linux_path "$original_key")
+
+      while [[ "$normalized_key" == */ ]]; do
+        normalized_key="${normalized_key%/}"
+      done
+
+      normalized_local["$normalized_key"]="${rules_local[$original_key]}"
     done
 
     rules_local=()
@@ -129,7 +136,7 @@ make_scope() {
   local -n RULES=$1
   local -n changed_files=$2
 
-  rule_paths_into_linux_paths RULES
+  array_keys_to_linux_paths_without_trailing_slashes RULES
 
   declare -A labels
 
