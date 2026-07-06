@@ -58,34 +58,6 @@ normalize_path() {
   fi
 }
 
-make_scope() {
-  local path="$1"
-  local dev_dir="$2"
-  local qa_dir="$3"
-
-  IFS='/' read -r root module <<< "$path"
-
-  case "$root" in
-    "$dev_dir")
-      if [ -n "$module" ]; then
-        echo "[DEV] $module"
-      else
-        echo "[DEV]"
-      fi
-      ;;
-    "$qa_dir")
-      if [ -n "$module" ]; then
-        echo "[QA] $module"
-      else
-        echo "[QA]"
-      fi
-      ;;
-    *)
-      echo ""
-      ;;
-  esac
-}
-
 get_jira_id_from_branch_name() {
     BRANCH=$1
     JIRA_PROJECT_KEY=$2
@@ -123,7 +95,7 @@ rule_paths_into_linux_paths() {
 }
 
 get_labels() {
-  local -n rules=$1
+  local -n rules_local=$1
   local -n changed_files=$2
 
   declare -A labels
@@ -132,14 +104,14 @@ get_labels() {
     best_label=""
     best_len=0
 
-    for rule in "${!rules[@]}"; do
+    for rule in "${!rules_local[@]}"; do
         # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
         if [[ "$file" == "$rule" ]] || [[ "$file" == "$rule/"* ]]; then
             len=${#rule}
 
             if (( len > best_len )); then
                 best_len=$len
-                best_label="${rules[$rule]}"
+                best_label="${rules_local[$rule]}"
             fi
         fi
     done
@@ -151,4 +123,39 @@ get_labels() {
   done
 
   echo "${!labels[@]}" | tr ' ' '\n' | sort | tr '\n' ' '
+}
+
+make_scope() {
+  local -n RULES=$1
+  local -n changed_files=$2
+
+  rule_paths_into_linux_paths RULES
+
+  declare -A labels
+
+  for file in "${changed_files[@]}"; do
+    best_label=""
+    best_len=0
+
+    for rule in "${!RULES[@]}"; do
+        # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
+        if [[ "$file" == "$rule" ]] || [[ "$file" == "$rule/"* ]]; then
+            len=${#rule}
+
+            if (( len > best_len )); then
+                best_len=$len
+                best_label="${RULES[$rule]}"
+            fi
+        fi
+    done
+
+    if [[ -n "$best_label" ]]; then
+        labels["$best_label"]=1
+    fi
+
+  done
+
+  labels_string=$(echo "${!labels[@]}" | tr ' ' '\n' | sort | tr '\n' ' ')
+
+  echo "$labels_string"
 }

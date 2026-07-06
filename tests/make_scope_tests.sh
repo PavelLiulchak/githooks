@@ -20,12 +20,22 @@ source $helper_tests_script
 
 ## tests
 echo ""
-echo "0. make_scope"
+echo "3. make_scope_tests"
+
+declare -A rules=(
+    ["code"]="DEV"
+    ["ansible/"]="OPS"
+    ["code/tests"]="QA"
+    ["code/autotests"]="QA"
+)
 
 echo ""
-echo "0.1. Test path_into_linux_path"
-arg="C:\Users\Test\project"
-expect="C:/Users/Test/project"
-res=$(path_into_linux_path "$arg")
-echo "path_into_linux_path \"$arg\""
-assert "$res" "$expect"
+echo "3.1. Test make_scope"
+
+files=("code/tests" "code/autotests" "ansible")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+make_scope rules files
