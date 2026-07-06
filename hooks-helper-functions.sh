@@ -108,17 +108,17 @@ path_into_linux_path() {
 }
 
 rule_paths_into_linux_paths() {
-    local -n rules=$1
-    local -A normalized
+    local -n rules_local=$1
+    local -A normalized_local
 
-    for key in "${!rules[@]}"; do
-        normalized["$(path_into_linux_path "$key")"]="${rules[$key]}"
+    for key in "${!rules_local[@]}"; do
+        normalized_local["$(path_into_linux_path "$key")"]="${rules_local[$key]}"
     done
 
-    rules=()
+    rules_local=()
 
-    for key in "${!normalized[@]}"; do
-        rules["$key"]="${normalized[$key]}"
+    for key in "${!normalized_local[@]}"; do
+        rules_local["$key"]="${normalized_local[$key]}"
     done
 }
 
