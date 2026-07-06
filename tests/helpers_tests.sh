@@ -1,5 +1,21 @@
 #!/bin/bash
 
+echo_green() {
+  line=$1
+  GREEN=$(tput setaf 2)
+  RESET=$(tput sgr0)
+
+  echo "${GREEN}$line${RESET}"
+}
+
+echo_red() {
+  line=$1
+  RED=$(tput setaf 1)
+  RESET=$(tput sgr0)
+
+  echo "${RED}$line${RESET}"
+}
+
 assert() {
   res=$1
   expect=$2
@@ -8,15 +24,9 @@ assert() {
   echo "expect = $expect"
 
   if [[ $res == $expect ]]; then
-    GREEN=$(tput setaf 2)
-    RESET=$(tput sgr0)
-
-    echo "${GREEN}Success${RESET}"
+    echo_green "Success"
   else
-    RED=$(tput setaf 1)
-    RESET=$(tput sgr0)
-
-    echo "${RED}Failed${RESET}"
+    echo_red "Failed"
   fi
 }
 
@@ -33,31 +43,25 @@ assert_assoc_array_equals() {
     local -n expected_local=$2
 
     if ((${#actual_local[@]} != ${#expected_local[@]})); then
-        RED=$(tput setaf 1)
-        RESET=$(tput sgr0)
-        echo "${RED}Assertion failed: array sizes differ${RESET}"
+        echo_red "Assertion failed: array sizes differ"
         return 1
     fi
 
     for key in "${!expected_local[@]}"; do
         if [[ ! -v actual_local["$key"] ]]; then
-                RED=$(tput setaf 1)
-                RESET=$(tput sgr0)
-                echo "${RED}Assertion failed: missing key '$key'${RESET}"
+                echo_red "Assertion failed: missing key '$key'"
                 return 1
         fi
 
         if [[ "${actual_local[$key]}" != "${expected_local[$key]}" ]]; then
             RED=$(tput setaf 1)
             RESET=$(tput sgr0)
-            echo "${RED}Assertion failed for key '$key':${RESET}"
-            echo "  actual:   '${actual_local[$key]}'"
-            echo "  expected: '${expected_local[$key]}'"
+            echo_red "Assertion failed for key '$key'"
+            echo_red "  actual:   '${actual_local[$key]}'"
+            echo_red "  expected: '${expected_local[$key]}'"
             return 1
         fi
     done
 
-    GREEN=$(tput setaf 2)
-    RESET=$(tput sgr0)
-    echo "${GREEN}Success${RESET}"
+    echo_green "Success"
 }
