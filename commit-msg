@@ -4,9 +4,9 @@
 JIRA_PROJECT_KEY="PROJ"
 # The rules paths are case sensitive
 declare -A RULES=(
-    ["code"]="DEV"
-    ["code/tests"]="QA"
-    ["code/autotests"]="QA"
+    ['code']="DEV"
+    ['code/tests']="QA"
+    ['code/autotests']="QA"
 )
 
 # If you use Windows paths in the array declaration, script transforms the paths into Linux paths anyway.

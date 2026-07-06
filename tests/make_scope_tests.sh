@@ -23,10 +23,10 @@ echo ""
 echo "3. make_scope_tests"
 
 declare -A rules=(
-    ["code"]="DEV"
-    ["ansible/"]="OPS"
-    ["code/tests"]="QA"
-    ["code/autotests"]="QA"
+    ['code']="DEV"
+    ['ansible/']="OPS"
+    ['code/tests']="QA"
+    ['code/autotests']="QA"
 )
 
 echo ""
