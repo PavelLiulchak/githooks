@@ -23,7 +23,7 @@ assert() {
   echo "res = $res"
   echo "expect = $expect"
 
-  if [[ $res == $expect ]]; then
+  if [[ "$res" == "$expect" ]]; then
     echo_green "Success"
   else
     echo_red "Failed"
