@@ -37,7 +37,7 @@ COMMON=$(common_path "${FILES[@]}")
 # You may use only normalization if they are located on the same level
 COMMON_STRIPPED=$(strip_path_before "$COMMON" "$QA_DIR")
 
-COMMON_NORMALIZED=$(normalize_path "$COMMON_STRIPPED")
+COMMON_NORMALIZED=$(get_root_path "$COMMON_STRIPPED")
 SCOPE=$(make_scope $COMMON_NORMALIZED $DEV_DIR $QA_DIR)
 
 # Jira ID

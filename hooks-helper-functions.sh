@@ -60,13 +60,9 @@ strip_path_before() {
 }
 
 # Normalize to two dirs in the path
-normalize_path() {
-  IFS='/' read -r a b c <<< "$1"
-  if [ -z "$b" ]; then
-    echo "$a"
-  else
-    echo "$a/$b"
-  fi
+get_root_path() {
+  IFS='/' read -r a b <<< "$1"
+  echo "$a"
 }
 
 get_jira_id_from_branch_name() {
