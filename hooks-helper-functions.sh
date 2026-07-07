@@ -33,19 +33,30 @@ common_path() {
 
 # strips subpath to $2
 strip_path_before() {
-  local path="$1"
-  local dir="$2"
+    
+    path="$(path_into_linux_path "$1")"
+    prefix="$(path_into_linux_path "$2")"
+    
+    # delete arbitrary amount of trailing slashes
+    while [[ "$path" == */ ]]; do
+        path="${path%/}"
+    done
 
-  IFS='/' read -ra parts <<< "$path"
+    while [[ "$prefix" == */ ]]; do
+        prefix="${prefix%/}"
+    done
 
-  for i in "${!parts[@]}"; do
-    if [[ "${parts[i]}" == "$dir" ]]; then
-      echo "${parts[@]:i}" | tr ' ' '/'
-      return
-    fi
-  done
-
-  echo "$path"
+    case $path in
+        "$prefix")
+            echo
+            ;;
+        "$prefix"/*)
+            echo "${path#"$prefix"/}"
+            ;;
+        *)
+            echo "$path"
+            ;;
+    esac
 }
 
 # Normalize to two dirs in the path
