@@ -59,10 +59,35 @@ strip_path_before() {
     esac
 }
 
-# Normalize to two dirs in the path
-get_root_path() {
-  IFS='/' read -r a b <<< "$1"
-  echo "$a"
+get_cut_path() {
+    local path="$1"
+    local depth="$2"
+
+    if [[ ! "$depth" =~ ^[0-9]+$ ]]; then
+        echo "Error: depth must be a non-negative integer" >&2
+        return 1
+    fi
+
+    while [[ "$path" == */ ]]; do
+        path="${path%/}"
+    done
+
+    local IFS='/'
+    local -a parts
+    read -ra parts <<< "$path"
+
+    local limit=$depth
+    (( limit > ${#parts[@]} )) && limit=${#parts[@]}
+
+    local result=""
+    local i
+
+    for ((i = 0; i < limit; i++)); do
+        [[ -n "$result" ]] && result+="/"
+        result+="${parts[i]}"
+    done
+
+    echo "$result"
 }
 
 get_jira_id_from_branch_name() {
