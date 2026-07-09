@@ -1,57 +1,51 @@
 #!/bin/bash
 
 # Set us!
-JIRA_PROJECT_KEY="PROJ"
+jira_project_key="PROJ"
 # The rules paths are case sensitive
-declare -A RULES=(
+declare -A rules=(
     ['code']="DEV"
     ['code/tests']="QA"
     ['code/autotests']="QA"
 )
 
-# If you use Windows paths in the array declaration, script transforms the paths into Linux paths anyway.
-rule_paths_into_linux_paths RULES
+# Tweak with caution, use numbers only!
+after_label_path_depth=1
 
 pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
 
-COMMIT_MSG_FILE=$1
+commit_msg_file=$1
 
 # git config commit.cleanup may be set to print verbose info (additional info lines start with #), we cut them of.
-MSG=$(cat "$COMMIT_MSG_FILE" | sed '/^#/,$d')
+msg=$(cat "$commit_msg_file" | sed '/^#/,$d')
 
 helper_functions_script="$script_dir/hooks-helper-functions.sh"
 
 if [[ ! -f "$helper_functions_script" ]]; then
-echo "$helper_functions_script is not found, nothing to source, exiting..."
-exit 1
+    echo "$helper_functions_script is not found, nothing to source, exiting..."
+    exit 1
 fi
 
-source $helper_functions_script
+source "$helper_functions_script"
 
-mapfile -d '' -t FILES < <(git diff --cached --name-only -z)
-COMMON=$(common_path "${FILES[@]}")
+mapfile -d '' -t files < <(git diff --cached --name-only -z)
 
-# I do this due to the project specific: QA_DIR - is a subdir of DEV_DIR.
-# You may use only normalization if they are located on the same level
-COMMON_STRIPPED=$(strip_path_before "$COMMON" "$QA_DIR")
-
-COMMON_NORMALIZED=$(get_root_path "$COMMON_STRIPPED")
-SCOPE=$(make_scope $COMMON_NORMALIZED $DEV_DIR $QA_DIR)
+scope=$(make_scope rules files "$after_label_path_depth")
 
 # Jira ID
-BRANCH=$(git branch --show-current)
-JIRAID=$(get_jira_id_from_branch_name "$BRANCH" "$JIRA_PROJECT_KEY")
+branch=$(git branch --show-current)
+jira_id=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 
-if [[ -n "$SCOPE" && "$MSG" != "$SCOPE"* ]]; then
-    MSG="$SCOPE: $MSG"
+if [[ -n "$scope" && "$msg" != "$scope"* ]]; then
+    msg="$scope $msg"
 fi
 
-if [[ -n "$JIRAID" && "$MSG" != *"$JIRAID"* ]]; then
-    MSG="$MSG
+if [[ -n "$jira_id" && "$msg" != *"$jira_id"* ]]; then
+    msg="$msg
 
-$JIRAID"
+$jira_id"
 fi
 
-echo "$MSG" > "$COMMIT_MSG_FILE"
+echo "$msg" > "$commit_msg_file"
