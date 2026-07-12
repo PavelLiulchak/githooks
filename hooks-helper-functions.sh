@@ -91,17 +91,20 @@ get_cut_path() {
 }
 
 get_jira_id_from_branch_name() {
-    BRANCH=$1
-    JIRA_PROJECT_KEY=$2
+    local branch=$1
+    local jira_project_key=$2
+    local jiraid
 
-    JIRAID=$(echo "$BRANCH" \
-  | grep -oiE "$JIRA_PROJECT_KEY[-_]?[0-9]+" \
-  | head -n1 \
-  | tr '[:lower:]' '[:upper:]')
+    jiraid=$(echo "$branch" \
+        | grep -oiE "${jira_project_key}[-_]*[0-9]+" \
+        | head -n1 \
+        | tr '[:lower:]' '[:upper:]')
 
-[ -n "$JIRAID" ] && JIRAID=$(echo "$JIRAID" | sed -E "s/${JIRA_PROJECT_KEY}[-_]?([0-9]+)/${JIRA_PROJECT_KEY}-\1/")
+    if [[ -n "$jiraid" ]]; then
+        jiraid=$(echo "$jiraid" | sed -E "s/${jira_project_key}[-_]*([0-9]+)/${jira_project_key}-\1/")
+    fi
 
-echo "$JIRAID"
+    echo "$jiraid"
 }
 
 path_into_linux_path() {
