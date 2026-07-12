@@ -233,10 +233,10 @@ make_scope() {
     common_normalized=$(get_cut_path "$common_stripped" "$after_label_path_depth")
 
     if [[ -n "$common_normalized" ]]; then
-      common_normalized="$common_normalized:"
+      common_normalized=" $common_normalized:"
     fi
 
-    scope="$scope $common_normalized"
+    scope="$scope$common_normalized"
   fi
 
   echo "$scope"

@@ -141,7 +141,7 @@ assert "$res" "$expect"
 echo ""
 echo "3.7. Test make_scope: QA label occurs once"
 
-files=("code/autotests/test.java" "ansible/python-src/script.py" "code/tests/test.cs")
+files=("code/autotests/ModuleUI1/yyyy" "code/autotests/ModuleUI1/yyyy" "code/autotests/ModuleUI1/yyyy" "dir/subdir/text4.cs")
 
 echo "rules:"
 echo_assoc_array rules
@@ -152,7 +152,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[OPS QA]"
+expect="[QA]"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
