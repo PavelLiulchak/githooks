@@ -112,24 +112,24 @@ path_into_linux_path() {
 }
 
 array_keys_to_linux_paths_without_trailing_slashes() {
-    local -n rules_local=$1
-    local -A normalized_local
+    local -n rules_ref_ref=$1
+    local -A normalized
     local original_key normalized_key
 
-    for original_key in "${!rules_local[@]}"; do
+    for original_key in "${!rules_ref_ref[@]}"; do
       normalized_key=$(path_into_linux_path "$original_key")
 
       while [[ "$normalized_key" == */ ]]; do
         normalized_key="${normalized_key%/}"
       done
 
-      normalized_local["$normalized_key"]="${rules_local[$original_key]}"
+      normalized["$normalized_key"]="${rules_ref_ref[$original_key]}"
     done
 
-    rules_local=()
+    rules_ref_ref=()
 
-    for key in "${!normalized_local[@]}"; do
-        rules_local["$key"]="${normalized_local[$key]}"
+    for key in "${!normalized[@]}"; do
+        rules_ref_ref["$key"]="${normalized[$key]}"
     done
 }
 
@@ -165,8 +165,8 @@ get_labels() {
 }
 
 make_scope() {
-  local -n RULES=$1
-  local -n changed_files=$2
+  local -n rules_ref=$1
+  local -n changed_files_ref=$2
   local after_label_path_depth=$3
   local key_path=
   local common_path=
@@ -174,23 +174,23 @@ make_scope() {
   local common_normalized=
   local scope=
 
-  array_keys_to_linux_paths_without_trailing_slashes RULES
+  array_keys_to_linux_paths_without_trailing_slashes rules_ref
 
   declare -A labels
 
-  for file in "${changed_files[@]}"; do
+  for file in "${changed_files_ref[@]}"; do
     best_label=""
     best_path=""
     best_len=0
 
-    for path in "${!RULES[@]}"; do
+    for path in "${!rules_ref[@]}"; do
         # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
         if [[ "$file" == "$path" ]] || [[ "$file" == "$path/"* ]]; then
             len=${#path}
 
             if (( len > best_len )); then
                 best_len=$len
-                best_label="${RULES[$path]}"
+                best_label="${rules_ref[$path]}"
                 best_path="$path"
             fi
         fi
@@ -212,7 +212,7 @@ make_scope() {
 
   if [[ ${#labels[@]} -eq 0 ]]; then
 
-    common_path=$(common_path "${changed_files[@]}")
+    common_path=$(common_path "${changed_files_ref[@]}")
     common_normalized=$(get_cut_path "$common_path" "$after_label_path_depth")
 
     if [[ -n "$common_normalized" ]]; then
@@ -225,7 +225,7 @@ make_scope() {
   if [[ ${#labels[@]} -eq 1 ]]; then
 
     key_path="${labels[@]}"
-    common_path=$(common_path "${changed_files[@]}")
+    common_path=$(common_path "${changed_files_ref[@]}")
     common_stripped=$(strip_path_before "$common_path" "$key_path")
     common_normalized=$(get_cut_path "$common_stripped" "$after_label_path_depth")
 
