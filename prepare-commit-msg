@@ -1,14 +1,22 @@
 #!/bin/bash
 
+# Set us!
+jira_project_key="PROJ"
+# The rules paths are case sensitive
+declare -A rules=(
+    ['code']="DEV"
+    ['code/tests']="QA"
+    ['code/autotests']="QA"
+)
+
+# Tweak with caution, use numbers only!
+after_label_path_depth=1
+
 pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
 
-DEV_DIR="code"
-QA_DIR="tests"
-JIRA_PROJECT_KEY="PROJ"
-
-COMMIT_MSG_FILE=$1
+commit_msg_file=$1
 
 helper_functions_script="$script_dir/hooks-helper-functions.sh"
 
@@ -17,7 +25,7 @@ echo "$helper_functions_script is not found, nothing to source, exiting..."
 exit 1
 fi
 
-source $helper_functions_script
+source "$helper_functions_script"
 
 commit_message_has_real_content() {
   awk '
@@ -28,7 +36,7 @@ commit_message_has_real_content() {
 }
 
 # avoid exisitng commit message rewriting, helpful in case of ammends, cherry-picks
-if commit_message_has_real_content "$COMMIT_MSG_FILE"; then
+if commit_message_has_real_content "$commit_msg_file"; then
   exit 0
 fi
 
@@ -36,26 +44,20 @@ if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
   exit 0
 fi
 
-mapfile -d '' -t FILES < <(git diff --cached --name-only -z)
-COMMON=$(common_path "${FILES[@]}")
+mapfile -d '' -t files < <(git diff --cached --name-only -z)
 
-# I do this due to the project specific: QA_DIR - is a subdir of DEV_DIR.
-# You may use only normalization if they are located on the same level
-COMMON_STRIPPED=$(strip_path_before "$COMMON" "$QA_DIR")
-
-COMMON_NORMALIZED=$(get_root_path "$COMMON_STRIPPED")
-SCOPE=$(make_scope $COMMON_NORMALIZED $DEV_DIR $QA_DIR)
+scope=$(make_scope rules files "$after_label_path_depth")
 
 # Jira ID
-BRANCH=$(git branch --show-current)
-JIRAID=$(get_jira_id_from_branch_name "$BRANCH" "$JIRA_PROJECT_KEY")
+branch=$(git branch --show-current)
+jira_id=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 
 {
-    echo "$SCOPE: <write your summary>"
+    echo "$scope <write your summary>"
     echo ""
     echo "<write your body>"
     echo ""
-    if [ -n "$JIRAID" ]; then
-      echo "$JIRAID"
+    if [ -n "$jira_id" ]; then
+      echo "$jira_id"
     fi
-} > "$COMMIT_MSG_FILE"
+} > "$commit_msg_file"
