@@ -200,7 +200,7 @@ assert "$res" "$expect"
 
 
 echo ""
-echo "3.10. Test make_scope: empty scope due to empty rules"
+echo "3.10. Test make_scope: empty scope due to empty rules and no file paths intersections"
 declare -A rules=()
 
 files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "ansible/python-src/script.py" "code/tests/test.cs")
@@ -215,5 +215,24 @@ echo "${files[@]}"
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
 expect=""
+echo "make_scope rules files"
+assert "$res" "$expect"
+
+echo ""
+echo "3.11. Test make_scope: no label, depth=2, empty rules"
+declare -A rules=()
+
+files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files:"
+echo "${files[@]}"
+
+echo ""
+res=$(make_scope rules files 2)
+expect="code/Module1:"
 echo "make_scope rules files"
 assert "$res" "$expect"
