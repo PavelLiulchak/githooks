@@ -31,6 +31,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.2. Test path_into_linux_path: path with space"
 arg="C:\Users\Test User\My Project\src"
@@ -40,6 +41,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.3. Test path_into_linux_path: linux path"
 arg="/home/user/project/src"
@@ -49,6 +51,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.4. Test path_into_linux_path: mixed path"
 arg="C:\Users/Test\project/src"
@@ -58,6 +61,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.5. Test path_into_linux_path: Windows drive root"
 arg="C:\\"
@@ -67,6 +71,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.6. Test path_into_linux_path: single slash"
 arg="\\"
@@ -76,6 +81,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.7. Test path_into_linux_path: empty arg"
 arg=""
@@ -85,6 +91,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.8. Test path_into_linux_path: spec symbols"
 arg="C:\Users\Test\foo-bar_123.txt"

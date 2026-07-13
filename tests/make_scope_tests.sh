@@ -48,6 +48,8 @@ expect="[DEV] Module1:"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.2. Test make_scope: One label, depth=1"
 
@@ -66,6 +68,8 @@ expect="[DEV] Module1:"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.3. Test make_scope: One label, depth=2"
 
@@ -84,6 +88,8 @@ expect="[DEV] Module1/SubModule1:"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.4. Test make_scope: One label, depth=100"
 
@@ -102,6 +108,8 @@ expect="[DEV] Module1/SubModule1/SubSubModule1:"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.5. Test make_scope: all labels"
 
@@ -120,6 +128,8 @@ expect="[DEV OPS QA]"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.6. Test make_scope: empty scope due to no changes under labels"
 
@@ -138,6 +148,8 @@ expect=""
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.7. Test make_scope: QA label occurs once"
 
@@ -156,6 +168,8 @@ expect="[QA]"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.8. Test make_scope: scope is common path with depth 2 due to no changes under labels"
 
@@ -174,6 +188,8 @@ expect="dir/subdir:"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.9. Test make_scope: One label, depth=1, Windows paths in rules"
 declare -A rules=(
@@ -199,6 +215,7 @@ echo "make_scope rules files"
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "3.10. Test make_scope: empty scope due to empty rules and no file paths intersections"
 declare -A rules=()
@@ -218,6 +235,8 @@ expect=""
 echo "make_scope rules files"
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "3.11. Test make_scope: no label, depth=2, empty rules"
 declare -A rules=()
@@ -238,7 +257,7 @@ echo "make_scope rules files"
 assert "$res" "$expect"
 
 
-
+#########################################
 # Empty labels work but it is not advised to use them, the approach may create empty scopes  
 # where they shouldn't be, that can be even more confusing.
 echo ""
@@ -263,7 +282,7 @@ echo "make_scope rules files"
 assert "$res" "$expect"
 
 
-
+#########################################
 echo ""
 echo "3.13. Test make_scope: rule with not empty path but empty label, all changes are hidden"
 declare -A rules=(
@@ -286,7 +305,7 @@ echo "make_scope rules files"
 assert "$res" "$expect"
 
 
-
+#########################################
 echo ""
 echo "3.14. Test make_scope: QA label, depth=2, rule with not empty path but empty label"
 declare -A rules=(

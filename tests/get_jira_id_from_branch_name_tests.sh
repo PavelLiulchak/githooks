@@ -31,6 +31,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.2. Test get_jira_id_from_branch_name, branch name with several dashes"
 branch="branch-proj---123-branch"
@@ -40,6 +42,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.3. Test get_jira_id_from_branch_name, branch name with underscore"
 branch="branch-proj_123-branch"
@@ -49,6 +53,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.4. Test get_jira_id_from_branch_name, branch name with several underscores"
 branch="branch-proj___123-branch"
@@ -58,6 +64,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.5. Test get_jira_id_from_branch_name"
 branch="branch-proj123-branch"
@@ -67,6 +75,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.6. Test get_jira_id_from_branch_name, pattern in the beginning"
 branch="proj-123-branch"
@@ -76,6 +86,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.7. Test get_jira_id_from_branch_name, pattern in the end"
 branch="branch-proj-123"
@@ -85,6 +97,8 @@ res=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 echo "get_jira_id_from_branch_name \"$branch\" \"$jira_project_key\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "6.8. Test get_jira_id_from_branch_name, different cases"
 branch="branch-PrOj-123"

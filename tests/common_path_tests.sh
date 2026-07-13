@@ -31,6 +31,8 @@ res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "1.2 Test common_path: returns root dir"
 arg1="source_dir/dir/subdir"
@@ -40,6 +42,8 @@ res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "1.3. Test common_path: path contains \"/\" in the end"
 arg1="source_dir/dir/subdir"
@@ -50,6 +54,7 @@ echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.4. Test common_path: returns root dir (different args order)"
 arg1="source_dir"
@@ -60,6 +65,7 @@ echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.5. Test common_path: same paths"
 arg1="source_dir/dir/subdir"
@@ -69,6 +75,7 @@ echo "common_path \"$arg1\" \"$arg1\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.6. Test common_path: returns emptiness (no paths intersection)"
 arg1="SOURCE_DIR/dir/subdir"
@@ -79,6 +86,7 @@ echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.7. Test common_path: returns paths with space"
 arg1="source dir/dir/subdir"
@@ -88,6 +96,8 @@ res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "1.8. Test common_path: returns empty path"
 arg1=""
@@ -98,6 +108,7 @@ echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.9. Test common_path: returns empty path (different args order)"
 arg1="source_dir/dir/subdir"
@@ -108,6 +119,7 @@ echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.10. Test common_path: returns empty path, several paths"
 arg1="source_dir/dir/subdir1"
@@ -119,6 +131,7 @@ echo "common_path \"$arg1\" \"$arg2\" \"$arg3\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.11. Test common_path: returns empty path, several paths (different args order)"
 arg1=""
@@ -130,6 +143,7 @@ echo "common_path \"$arg1\" \"$arg2\" \"$arg3\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.12. Test common_path: single argument"
 arg1="source_dir/dir/subdir"
@@ -139,6 +153,7 @@ echo "common_path \"$arg1\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "1.13. Test common_path: returns linux path in case windows path"
 arg1="source dir\dir\subdir1"

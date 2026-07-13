@@ -31,6 +31,8 @@ res=$(get_cut_path "$path" "$depth")
 echo "get_cut_path \"$path\" \"$depth\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "5.2. Test get_cut_path"
 path="source_dir/dir/sub dir"
@@ -40,6 +42,8 @@ res=$(get_cut_path "$path" "$depth")
 echo "get_cut_path \"$path\" \"$depth\""
 assert "$res" "$expect"
 
+
+#########################################
 echo ""
 echo "5.3. Test get_cut_path"
 path="source_dir/dir/sub dir"
@@ -48,6 +52,8 @@ res=$(get_cut_path "$path" "$depth")
 echo "get_cut_path \"$path\" \"$depth\""
 assert "$res" "$path"
 
+
+#########################################
 echo ""
 echo "5.4. Test get_cut_path"
 path="source_dir/dir/sub dir"

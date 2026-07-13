@@ -22,6 +22,8 @@ source $helper_tests_script
 echo ""
 echo "2. array_keys_to_linux_paths_without_trailing_slashes"
 
+
+#########################################
 echo ""
 echo "2.1. Test array_keys_to_linux_paths_without_trailing_slashes, Windows paths"
 declare -A actual=(
@@ -47,6 +49,8 @@ array_keys_to_linux_paths_without_trailing_slashes actual
 
 assert_assoc_array_equals actual expected
 
+
+#########################################
 echo ""
 echo "2.2. Test array_keys_to_linux_paths_without_trailing_slashes, Linux paths"
 declare -A actual=(
@@ -73,6 +77,7 @@ array_keys_to_linux_paths_without_trailing_slashes actual
 assert_assoc_array_equals actual expected
 
 
+#########################################
 echo ""
 echo "2.3. Test array_keys_to_linux_paths_without_trailing_slashes, Mixed paths"
 declare -A actual=(
@@ -99,6 +104,7 @@ array_keys_to_linux_paths_without_trailing_slashes actual
 assert_assoc_array_equals actual expected
 
 
+#########################################
 echo ""
 echo "2.4. Test array_keys_to_linux_paths_without_trailing_slashes, empty arrays"
 declare -A actual=()
