@@ -156,7 +156,7 @@ make_scope() {
     best_len=0
 
     for path in "${!rules_ref[@]}"; do
-      # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
+      # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one with it label
       if [[ "$file" == "$path" ]] || [[ "$file" == "$path/"* ]]; then
         len=${#path}
 
@@ -192,6 +192,7 @@ make_scope() {
     scope="$common_normalized"
   fi
 
+  # common path finding makes sense only if we have one matched rule
   if [[ ${#matched_rules[@]} -eq 1 ]]; then
     key_path="${!matched_rules[@]}"
     common_path=$(common_path "${changed_files_ref[@]}")
