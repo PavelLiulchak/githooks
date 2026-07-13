@@ -236,3 +236,75 @@ res=$(make_scope rules files 2)
 expect="code/Module1:"
 echo "make_scope rules files"
 assert "$res" "$expect"
+
+
+
+# Empty labels work but it is not advised to use them, the approach may create empty scopes  
+# where they shouldn't be, that can be even more confusing.
+echo ""
+echo "3.12. Test make_scope: rule with not empty path but empty label"
+declare -A rules=(
+    ['code/Module1']=""
+)
+
+files=("code/Module1/SubModule1/text1.java" "code/Module1/SubModule1/text2.java")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files:"
+echo "${files[@]}"
+
+echo ""
+res=$(make_scope rules files $after_label_path_depth)
+expect="SubModule1:"
+echo "make_scope rules files"
+assert "$res" "$expect"
+
+
+
+echo ""
+echo "3.13. Test make_scope: rule with not empty path but empty label, all changes are hidden"
+declare -A rules=(
+    ['code/Module1']=""
+)
+
+files=("code/Module1/text1.java" "code/Module1/text2.java")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files:"
+echo "${files[@]}"
+
+echo ""
+res=$(make_scope rules files $after_label_path_depth)
+expect=""
+echo "make_scope rules files"
+assert "$res" "$expect"
+
+
+
+echo ""
+echo "3.14. Test make_scope: QA label, depth=2, rule with not empty path but empty label"
+declare -A rules=(
+    ['code']=""
+    ['code\tests']="QA"
+)
+
+files=("code/tests/Dir/test.cs" "code/tests/Dir/test2.cs")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files:"
+echo "${files[@]}"
+
+echo ""
+res=$(make_scope rules files $after_label_path_depth)
+expect="[QA] Dir:"
+echo "make_scope rules files"
+assert "$res" "$expect"

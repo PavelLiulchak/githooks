@@ -148,7 +148,7 @@ make_scope() {
 
   array_keys_to_linux_paths_without_trailing_slashes rules_ref
 
-  declare -A labels
+  declare -A matched_rules
 
   for file in "${changed_files_ref[@]}"; do
     best_label=""
@@ -156,25 +156,24 @@ make_scope() {
     best_len=0
 
     for path in "${!rules_ref[@]}"; do
-        # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
-        if [[ "$file" == "$path" ]] || [[ "$file" == "$path/"* ]]; then
-            len=${#path}
+      # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one
+      if [[ "$file" == "$path" ]] || [[ "$file" == "$path/"* ]]; then
+        len=${#path}
 
-            if (( len > best_len )); then
-                best_len=$len
-                best_label="${rules_ref[$path]}"
-                best_path="$path"
-            fi
+        if (( len > best_len )); then
+          best_len=$len
+          best_label="${rules_ref[$path]}"
+          best_path="$path"
         fi
+      fi
     done
 
-    if [[ -n "$best_label" ]]; then
-        labels["$best_label"]=$best_path
+    if [[ -n "$best_path" ]]; then
+      matched_rules["$best_path"]="$best_label"
     fi
-
   done
 
-  labels_string=$(echo "${!labels[@]}" | tr ' ' '\n' | sort | tr '\n' ' ')
+  labels_string=$(echo "${matched_rules[@]}" | tr ' ' '\n' | sed '/^$/d' | sort | tr '\n' ' ')
   # remove trailing spaces in the end
   labels_string="${labels_string%"${labels_string##*[! ]}"}"
 
@@ -182,8 +181,7 @@ make_scope() {
     scope="[$labels_string]"
   fi
 
-  if [[ ${#labels[@]} -eq 0 ]]; then
-
+  if [[ ${#matched_rules[@]} -eq 0 ]]; then
     common_path=$(common_path "${changed_files_ref[@]}")
     common_normalized=$(get_cut_path "$common_path" "$after_label_path_depth")
 
@@ -194,18 +192,21 @@ make_scope() {
     scope="$common_normalized"
   fi
 
-  if [[ ${#labels[@]} -eq 1 ]]; then
-
-    key_path="${labels[@]}"
+  if [[ ${#matched_rules[@]} -eq 1 ]]; then
+    key_path="${!matched_rules[@]}"
     common_path=$(common_path "${changed_files_ref[@]}")
     common_stripped=$(strip_path_before "$common_path" "$key_path")
     common_normalized=$(get_cut_path "$common_stripped" "$after_label_path_depth")
 
     if [[ -n "$common_normalized" ]]; then
-      common_normalized=" $common_normalized:"
-    fi
+      common_normalized="$common_normalized:"
 
-    scope="$scope$common_normalized"
+      if [[ -n "$scope" ]]; then
+        scope="$scope $common_normalized"
+      else
+        scope="$common_normalized"
+      fi
+    fi
   fi
 
   echo "$scope"

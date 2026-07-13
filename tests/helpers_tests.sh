@@ -20,8 +20,8 @@ assert() {
   res=$1
   expect=$2
 
-  echo "res = $res"
-  echo "expect = $expect"
+  echo "res = \"$res\""
+  echo "expect = \"$expect\""
 
   if [[ "$res" == "$expect" ]]; then
     echo_green "Success"
