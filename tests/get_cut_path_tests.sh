@@ -23,7 +23,7 @@ echo ""
 echo "5. get_cut_path"
 
 echo ""
-echo "5.1. Test get_cut_path"
+echo "5.1. Test get_cut_path, depth = 0"
 path="source_dir/dir/sub dir"
 depth=0
 expect=""
@@ -34,7 +34,7 @@ assert "$res" "$expect"
 
 #########################################
 echo ""
-echo "5.2. Test get_cut_path"
+echo "5.2. Test get_cut_path, depth = 1"
 path="source_dir/dir/sub dir"
 depth=1
 expect="source_dir"
@@ -45,7 +45,7 @@ assert "$res" "$expect"
 
 #########################################
 echo ""
-echo "5.3. Test get_cut_path"
+echo "5.3. Test get_cut_path, depth is equal to amount of directory components"
 path="source_dir/dir/sub dir"
 depth=3
 res=$(get_cut_path "$path" "$depth")
@@ -55,7 +55,7 @@ assert "$res" "$path"
 
 #########################################
 echo ""
-echo "5.4. Test get_cut_path"
+echo "5.4. Test get_cut_path, depth is greater than amount of directory components"
 path="source_dir/dir/sub dir"
 depth=10
 res=$(get_cut_path "$path" "$depth")
