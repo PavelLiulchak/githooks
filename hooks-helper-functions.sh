@@ -136,6 +136,29 @@ array_keys_to_linux_paths_without_trailing_slashes() {
     done
 }
 
+# check me and test
+strip_scope_and_path() {
+    local msg=$1
+    local scope=$2
+
+    if [[ -z "$scope" ]]; then
+        echo "$msg"
+        return
+    fi
+
+    case "$msg" in
+        "$scope "*)
+            echo "${msg#"$scope "}"
+            ;;
+        "$scope"*)
+            echo "${msg#"$scope"}"
+            ;;
+        *)
+            echo "$msg"
+            ;;
+    esac
+}
+
 make_scope() {
   local -n rules_ref=$1
   local -n changed_files_ref=$2
