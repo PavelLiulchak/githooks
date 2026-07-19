@@ -30,6 +30,20 @@ fi
 
 source "$helper_functions_script"
 
+commit_message_exists() {
+    local file=$1
+
+    grep -qvE '^[[:space:]]*(#|$)' "$file"
+}
+
+if commit_message_exists "$commit_msg_file"; then
+  exit 0
+fi
+
+if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
+  exit 0
+fi
+
 mapfile -d '' -t files < <(git diff --cached --name-only -z)
 
 scope=$(make_scope rules files "$after_label_path_depth")
