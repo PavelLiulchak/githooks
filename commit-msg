@@ -30,17 +30,37 @@ fi
 
 source "$helper_functions_script"
 
-mapfile -d '' -t files < <(git diff --cached --name-only -z)
+mapfile -d '' -t index_files < <(git diff --cached --name-only -z)
+index_scope=$(make_scope rules index_files "$after_label_path_depth")
 
-scope=$(make_scope rules files "$after_label_path_depth")
+# find head scope if head exists, (to detect potential --amend cases)
+head_scope=""
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+    mapfile -d '' -t head_files < <(git diff-tree --no-commit-id --name-only -r HEAD)
+    head_scope=$(make_scope rules head_files "$after_label_path_depth")
+fi
+
+# if you don't modify the message scope intentionally, the msg will contain head_scope in case of amends
+if [[ "$msg" == "$head_scope"* ]]; then
+    files=("${head_files[@]}" "${index_files[@]}")
+
+    # rebuild scope to account for next amend case
+    scope=$(make_scope rules files "$after_label_path_depth")
+
+    msg=$(strip_scope_and_path "$msg" "$head_scope")
+    msg="$scope $msg"
+
+else
+
+    if [[ -n "$index_scope" && "$msg" != "$index_scope"* ]]; then
+        msg="$index_scope $msg"
+    fi
+
+fi
 
 # Jira ID
 branch=$(git branch --show-current)
 jira_id=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
-
-if [[ -n "$scope" && "$msg" != "$scope"* ]]; then
-    msg="$scope $msg"
-fi
 
 last_line=$(echo "$msg" | tail -n1)
 if [[ -n "$jira_id" && "$last_line" != "$jira_id" ]]; then
