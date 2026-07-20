@@ -42,7 +42,8 @@ if [[ -n "$scope" && "$msg" != "$scope"* ]]; then
     msg="$scope $msg"
 fi
 
-if [[ -n "$jira_id" && "$msg" != *"$jira_id"* ]]; then
+last_line=$(echo "$msg" | tail -n1)
+if [[ -n "$jira_id" && "$last_line" != "$jira_id" ]]; then
     msg="$msg
 
 $jira_id"
