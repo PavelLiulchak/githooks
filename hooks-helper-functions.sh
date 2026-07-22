@@ -201,7 +201,7 @@ make_scope() {
   labels_string="${labels_string%"${labels_string##*[! ]}"}"
 
   if [[ -n "$labels_string" ]]; then
-    scope="[$labels_string]"
+    scope="$labels_string"
   fi
 
   if [[ ${#matched_rules[@]} -eq 0 ]]; then
@@ -209,10 +209,8 @@ make_scope() {
     common_normalized=$(get_cut_path "$common_path" "$after_label_path_depth")
 
     if [[ -n "$common_normalized" ]]; then
-      common_normalized="$common_normalized:"
+      scope="$common_normalized"
     fi
-
-    scope="$common_normalized"
   fi
 
   # common path finding makes sense only if we have one matched rule
@@ -223,8 +221,6 @@ make_scope() {
     common_normalized=$(get_cut_path "$common_stripped" "$after_label_path_depth")
 
     if [[ -n "$common_normalized" ]]; then
-      common_normalized="$common_normalized:"
-
       if [[ -n "$scope" ]]; then
         scope="$scope $common_normalized"
       else
@@ -233,5 +229,9 @@ make_scope() {
     fi
   fi
 
-  echo "$scope"
+  if [[ -n "$scope" ]]; then
+    echo "($scope):"
+  else
+    echo "$scope"
+  fi
 }

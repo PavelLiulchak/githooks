@@ -44,7 +44,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[DEV] Module1:"
+expect="(DEV Module1):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -64,7 +64,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[DEV] Module1:"
+expect="(DEV Module1):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -84,7 +84,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files 2)
-expect="[DEV] Module1/SubModule1:"
+expect="(DEV Module1/SubModule1):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -104,7 +104,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files 100)
-expect="[DEV] Module1/SubModule1/SubSubModule1:"
+expect="(DEV Module1/SubModule1/SubSubModule1):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -124,7 +124,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[DEV OPS QA]"
+expect="(DEV OPS QA):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -164,7 +164,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[QA]"
+expect="(QA):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -184,7 +184,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files 2)
-expect="dir/subdir:"
+expect="(dir/subdir):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -210,7 +210,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[DEV OPS QA]"
+expect="(DEV OPS QA):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -252,7 +252,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files 2)
-expect="code/Module1:"
+expect="(code/Module1):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -277,7 +277,7 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="SubModule1:"
+expect="(SubModule1):"
 echo "make_scope rules files"
 assert "$res" "$expect"
 
@@ -324,6 +324,6 @@ echo "${files[@]}"
 
 echo ""
 res=$(make_scope rules files $after_label_path_depth)
-expect="[QA] Dir:"
+expect="(QA Dir):"
 echo "make_scope rules files"
 assert "$res" "$expect"
