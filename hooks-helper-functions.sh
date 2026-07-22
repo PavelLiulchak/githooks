@@ -159,6 +159,17 @@ strip_scope_and_path() {
     esac
 }
 
+replace_scope() {
+    local text="$1"
+    local replacement="$2"
+
+    text="${text/\(*\):/$replacement}"
+
+    text="${text#"${text%%[![:space:]]*}"}"
+
+    echo "$text"
+}
+
 make_scope() {
   local -n rules_ref=$1
   local -n changed_files_ref=$2
