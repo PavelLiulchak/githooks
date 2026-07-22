@@ -43,7 +43,7 @@ if git rev-parse --verify HEAD >/dev/null 2>&1; then
 fi
 
 # if you don't modify the message scope intentionally, the msg will contain head_scope in case of amends
-if [[ "$msg" == "$head_scope"* ]]; then
+if [[ "$msg" == *"$head_scope"* ]]; then
     echo "msg == head_scope" >> /tmp/hooks_debug/debug.log
 
     files=("${head_files[@]}" "${index_files[@]}")
@@ -61,7 +61,11 @@ if [[ "$msg" == "$head_scope"* ]]; then
 
 else
     if [[ -n "$index_scope" ]]; then
-        msg=$(replace_scope "$msg" "$index_scope")
+        if [[ $msg == *\(*\):* ]]; then
+            msg=$(replace_scope "$msg" "$index_scope")
+        else
+            msg="$index_scope $msg"
+        fi
     fi
 fi
 
