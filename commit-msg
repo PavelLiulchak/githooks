@@ -55,18 +55,14 @@ if [[ "$msg" == "$head_scope"* ]]; then
 
     echo "scope == $scope" >> /tmp/hooks_debug/debug.log
 
-    msg=$(strip_scope_and_path "$msg" "$head_scope")
-
     echo "msg == $msg" >> /tmp/hooks_debug/debug.log
-    msg="$scope $msg"
-    echo "msg with scope == $msg" >> /tmp/hooks_debug/debug.log
+    msg=$(replace_scope "$msg" "$scope")
+    echo "msg after repalce == $msg" >> /tmp/hooks_debug/debug.log
 
 else
-
-    if [[ -n "$index_scope" && "$msg" != "$index_scope"* ]]; then
-        msg="$index_scope $msg"
+    if [[ -n "$index_scope" ]]; then
+        msg=$(replace_scope "$msg" "$index_scope")
     fi
-
 fi
 
 # Jira ID
