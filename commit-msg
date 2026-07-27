@@ -1,17 +1,5 @@
 #!/bin/bash
 
-# Set us!
-jira_project_key="PROJ"
-# The rules paths are case sensitive
-declare -A rules=(
-    ['code']="DEV"
-    ['code/tests']="QA"
-    ['code/autotests']="QA"
-)
-
-# Tweak with caution, use numbers only!
-after_label_path_depth=1
-
 pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
@@ -29,6 +17,16 @@ if [[ ! -f "$helper_functions_script" ]]; then
 fi
 
 source "$helper_functions_script"
+
+githooks_config_script="$script_dir/githooks_config.sh"
+
+if [[ ! -f "$githooks_config_script" ]]; then
+    echo "Config $githooks_config_script is not found, nothing to source, exiting..."
+    exit 1
+fi
+
+source "$githooks_config_script"
+
 
 mapfile -d '' -t index_files < <(git diff --cached --name-only -z)
 index_scope=$(make_scope rules index_files "$after_label_path_depth")
