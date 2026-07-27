@@ -29,13 +29,13 @@ source "$githooks_config_script"
 
 
 mapfile -d '' -t index_files < <(git diff --cached --name-only -z)
-index_scope=$(make_scope rules index_files "$after_label_path_depth")
+index_scope=$(make_scope team1_rules index_files "$path_depth")
 
 # find head scope if head exists, (to detect potential --amend cases)
 head_scope=""
 if git rev-parse --verify HEAD >/dev/null 2>&1; then
     mapfile -d '' -t head_files < <(git diff-tree --no-commit-id --name-only -r -z HEAD)
-    head_scope=$(make_scope rules head_files "$after_label_path_depth")
+    head_scope=$(make_scope team1_rules head_files "$path_depth")
     echo "head_files == ${head_files[@]}" >> /tmp/hooks_debug/debug.log
     echo "head_scope == $head_scope" >> /tmp/hooks_debug/debug.log
 fi
@@ -49,7 +49,7 @@ if [[ "$msg" == *"$head_scope"* ]]; then
     echo "files == ${files[@]}" >> /tmp/hooks_debug/debug.log
 
     # rebuild scope to account for next amend case
-    scope=$(make_scope rules files "$after_label_path_depth")
+    scope=$(make_scope team1_rules files "$path_depth")
 
     echo "scope == $scope" >> /tmp/hooks_debug/debug.log
 
