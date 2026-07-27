@@ -23,307 +23,438 @@ echo ""
 echo "3. make_scope_tests"
 
 declare -A rules=(
-    ['code']="DEV"
-    ['ansible/']="OPS"
-    ['code/tests']="QA"
-    ['code/autotests']="QA"
+    ['code']="dev"
+    ['code/Module1']="mod1"
+    ['code/Module2']="mod2"
+    ['code/Module3']="mod3"
 )
-after_label_path_depth=1
+no_label_path_depth=1
 
 echo ""
-echo "3.1. Test make_scope: One label"
+echo "3.1. Test make_scope: One main label"
 
-files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java")
+files=("code/Dir1/text1.java" "code/Dir2/SubDir2/text2.java" "code/Dir3/SubDir3/text3.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(DEV Module1):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
 
 
 #########################################
 echo ""
-echo "3.2. Test make_scope: One label, depth=1"
+echo "3.2. Test make_scope: Boundary check, one main label + common_path of not labeled one, no_label_path_depth = 1"
 
-files=("code/Module1/SubModule1/SubSubModule1/text1.java" "code/Module1/SubModule1/SubSubModule1/text2.java")
+files=("code/Dir1/SubDir1/SubSubDir1/text1.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(DEV Module1):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev Dir1"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
 
 
 #########################################
 echo ""
-echo "3.3. Test make_scope: One label, depth=2"
+echo "3.3. Test make_scope: One main label + common_path of not labeled ones, no_label_path_depth = 1"
 
-files=("code/Module1/SubModule1/SubSubModule1/text1.java" "code/Module1/SubModule1/SubSubModule1/text2.java")
+files=("code/Dir1/SubDir1/SubSubDir1/text1.java" "code/Dir1/SubDir1/SubSubDir1/text2.java" "code/Dir1/SubDir1/SubSubDir1/text3.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
-res=$(make_scope rules files 2)
-expect="(DEV Module1/SubModule1):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev Dir1"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+no_label_path_depth=1
 
 
 #########################################
 echo ""
-echo "3.4. Test make_scope: One label, depth=100"
+echo "3.4. Test make_scope: One main label + common_path of not labeled ones, no_label_path_depth = 2"
+no_label_path_depth=2
 
-files=("code/Module1/SubModule1/SubSubModule1/text1.java" "code/Module1/SubModule1/SubSubModule1/text2.java")
+files=("code/Dir1/SubDir1/SubSubDir1/text1.java" "code/Dir1/SubDir1/SubSubDir1/text2.java" "code/Dir1/SubDir1/SubSubDir1/text3.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
-res=$(make_scope rules files 100)
-expect="(DEV Module1/SubModule1/SubSubModule1):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev Dir1/SubDir1"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+no_label_path_depth=1
 
 
 #########################################
 echo ""
-echo "3.5. Test make_scope: all labels"
+echo "3.5. Test make_scope: One main label + common_path of not labeled ones, no_label_path_depth = 100"
+no_label_path_depth=100
 
-files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "ansible/python-src/script.py" "code/tests/test.cs")
+files=("code/Dir1/SubDir1/SubSubDir1/text1.java" "code/Dir1/SubDir1/SubSubDir1/text2.java" "code/Dir1/SubDir1/SubSubDir1/text3.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(DEV OPS QA):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev Dir1/SubDir1/SubSubDir1"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+no_label_path_depth=1
 
 
 #########################################
 echo ""
-echo "3.6. Test make_scope: empty scope due to no changes under labels"
+echo "3.6. Test make_scope: changes are under all labels"
 
-files=("dir/subdir/text1.java" "dir/subdir/subsubdir/text2.java" "dir2/python-src/script.py" "dir3/tests/test.cs")
+files=("code/text.java" "code/Module1/text1.java" "code/Module2/SubModule2/text2.java" "code/Module3/SubModule3/text3.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.7. Test make_scope: Boundary check, one change is under main label"
+
+files=("code/text.java")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev text.java"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.8. Test make_scope: all changes are under one label"
+
+files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "code/Module1/SubModule1/SubSubModule1/text3.java")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev mod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+########################################
+echo ""
+echo "3.9. Test make_scope: Boundary check, one change is under one label"
+
+files=("code/Module1/text1.java")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev mod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.10. Test make_scope: some changes are under main label, one is not"
+
+files=("code/Module1/text1.java" "code/Module2/SubModule2/text2.java" "dir/subdir/text3.java")
+expected_remaining_files=("dir/subdir/text3.java")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.11. Test make_scope: some changes are under one label, one is not"
+
+files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "dir/subdir/text3.java")
+expected_remaining_files=("dir/subdir/text3.java")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev mod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.12. Test make_scope: empty scope due to no changes under labels"
+
+files=("dir/subdir/text1.java" "dir/subdir/subsubdir/text2.java" "dir/subdir/text2.java")
+expected_remaining_files=("${files[@]}")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
 expect=""
-echo "make_scope rules files"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
 
 
 #########################################
 echo ""
-echo "3.7. Test make_scope: QA label occurs once"
-
-files=("code/autotests/ModuleUI1/yyyy" "code/autotests/ModuleUI1/yyyy" "code/autotests/ModuleUI1/yyyy" "dir/subdir/text4.cs")
-
-echo "rules:"
-echo_assoc_array rules
-
-echo ""
-echo "files:"
-echo "${files[@]}"
-
-echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(QA):"
-echo "make_scope rules files"
-assert "$res" "$expect"
-
-
-#########################################
-echo ""
-echo "3.8. Test make_scope: scope is common path with depth 2 due to no changes under labels"
-
-files=("dir/subdir/text1.java" "dir/subdir/text2.java" "dir/subdir/text3.cs" "dir/subdir/text4.cs")
-
-echo "rules:"
-echo_assoc_array rules
-
-echo ""
-echo "files:"
-echo "${files[@]}"
-
-echo ""
-res=$(make_scope rules files 2)
-expect="(dir/subdir):"
-echo "make_scope rules files"
-assert "$res" "$expect"
-
-
-#########################################
-echo ""
-echo "3.9. Test make_scope: One label, depth=1, Windows paths in rules"
+echo "3.13. Test make_scope: One label, depth=1, Windows paths in rules"
 declare -A rules=(
-    ['code']="DEV"
-    ['ansible\']="OPS"
-    ['code\tests']="QA"
-    ['code\autotests']="QA"
+    ['code']="dev"
+    ['code\Module1']="mod1"
+    ['code\Module2']="mod2"
+    ['code\Module3']="mod3"
 )
 
-files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "ansible/python-src/script.py" "code/tests/test.cs")
+files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "code/Module1/SubModule1/SubSubModule1/text3.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(DEV OPS QA):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev mod1"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
 
 
 #########################################
 echo ""
-echo "3.10. Test make_scope: empty scope due to empty rules and no file paths intersections"
+echo "3.14. Test make_scope: one label rule"
+declare -A rules=(
+    ['code']="dev"
+)
+
+files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "code/tests/test.cs")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dev"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.15. Test make_scope: one label rule, files are empty"
+declare -A rules=(
+    ['code']="dev"
+)
+
+files=()
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect=""
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+
+#########################################
+echo ""
+echo "3.16. Test make_scope: empty scope due to empty rules"
 declare -A rules=()
 
-files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "ansible/python-src/script.py" "code/tests/test.cs")
+files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java" "code/tests/test.cs")
+expected_remaining_files=("${files[@]}")
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
+res=
+make_scope files $no_label_path_depth res rules
 expect=""
-echo "make_scope rules files"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
 
 
 #########################################
+# Empty labels work but it is not advised to use them, the approach may create confusing scopes.
 echo ""
-echo "3.11. Test make_scope: no label, depth=2, empty rules"
-declare -A rules=()
-
-files=("code/Module1/text1.java" "code/Module1/SubModule1/text2.java")
-
-echo "rules:"
-echo_assoc_array rules
-
-echo ""
-echo "files:"
-echo "${files[@]}"
-
-echo ""
-res=$(make_scope rules files 2)
-expect="(code/Module1):"
-echo "make_scope rules files"
-assert "$res" "$expect"
-
-
-#########################################
-# Empty labels work but it is not advised to use them, the approach may create empty scopes  
-# where they shouldn't be, that can be even more confusing.
-echo ""
-echo "3.12. Test make_scope: rule with not empty path but empty label"
+echo "3.17. Test make_scope: rule with not empty path but empty label"
 declare -A rules=(
-    ['code/Module1']=""
+    ['code']=""
 )
 
 files=("code/Module1/SubModule1/text1.java" "code/Module1/SubModule1/text2.java")
+expected_remaining_files=()
 
 echo "rules:"
 echo_assoc_array rules
 
 echo ""
-echo "files:"
-echo "${files[@]}"
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
 
 echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(SubModule1):"
-echo "make_scope rules files"
+res=
+make_scope files $no_label_path_depth res rules
+expect="Module1"
+echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
-
-
-#########################################
-echo ""
-echo "3.13. Test make_scope: rule with not empty path but empty label, all changes are hidden"
-declare -A rules=(
-    ['code/Module1']=""
-)
-
-files=("code/Module1/text1.java" "code/Module1/text2.java")
-
-echo "rules:"
-echo_assoc_array rules
-
-echo ""
-echo "files:"
-echo "${files[@]}"
-
-echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect=""
-echo "make_scope rules files"
-assert "$res" "$expect"
-
-
-#########################################
-echo ""
-echo "3.14. Test make_scope: QA label, depth=2, rule with not empty path but empty label"
-declare -A rules=(
-    ['code']=""
-    ['code\tests']="QA"
-)
-
-files=("code/tests/Dir/test.cs" "code/tests/Dir/test2.cs")
-
-echo "rules:"
-echo_assoc_array rules
-
-echo ""
-echo "files:"
-echo "${files[@]}"
-
-echo ""
-res=$(make_scope rules files $after_label_path_depth)
-expect="(QA Dir):"
-echo "make_scope rules files"
-assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files

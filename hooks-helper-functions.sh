@@ -170,79 +170,136 @@ replace_scope() {
     echo "$text"
 }
 
+# test me, delete me?
+deduplicate_specific_label() {
+    local -n arr=$1
+    local label=$2
+
+    local found=false
+    local -a result=()
+
+    for item in "${arr[@]}"; do
+        if [[ "$item" == "$label" ]]; then
+            if ! $found; then
+                result+=("$item")
+                found=true
+            fi
+        else
+            result+=("$item")
+        fi
+    done
+
+    arr=("${result[@]}")
+}
+
+
+get_entry_with_shortest_key() {
+    local -n map=$1
+    local -n key_ref=$2
+    local -n value_ref=$3
+
+    key_ref=
+    value_ref=
+
+    local key
+
+    for key in "${!map[@]}"; do
+        if [[ -z $key_ref || ${#key} -lt ${#key_ref} ]]; then
+            key_ref=$key
+            value_ref=${map[$key]}
+        fi
+    done
+}
+
+
 make_scope() {
-  local -n rules_ref=$1
-  local -n changed_files_ref=$2
-  local after_label_path_depth=$3
-  local key_path=
-  local common_path=
-  local common_stripped=
-  local common_normalized=
-  local scope=
+  local -n changed_files_ref_ref=$1
+  local no_label_path_depth=$2
+  local -n scope_ref=$3
+  local -n rules_ref=$4
 
   array_keys_to_linux_paths_without_trailing_slashes rules_ref
 
-  declare -A matched_rules
+  local main_path=
+  local main_label=
+  get_entry_with_shortest_key rules_ref main_path main_label
 
-  for file in "${changed_files_ref[@]}"; do
-    best_label=""
-    best_path=""
-    best_len=0
+  local -a files_under_rules=()
+  local -a remaining_files=()
 
-    for path in "${!rules_ref[@]}"; do
-      # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one with it label
-      if [[ "$file" == "$path" ]] || [[ "$file" == "$path/"* ]]; then
-        len=${#path}
-
-        if (( len > best_len )); then
-          best_len=$len
-          best_label="${rules_ref[$path]}"
-          best_path="$path"
-        fi
-      fi
-    done
-
-    if [[ -n "$best_path" ]]; then
-      matched_rules["$best_path"]="$best_label"
+  for file in "${changed_files_ref_ref[@]}"; do
+    if [[ "$file" == "$main_path" ]] || [[ "$file" == "$main_path/"* ]]; then
+      files_under_rules+=("$file")
+    else
+      remaining_files+=("$file")
     fi
   done
 
-  labels_string=$(echo "${matched_rules[@]}" | tr ' ' '\n' | sed '/^$/d' | sort | tr '\n' ' ')
-  # remove trailing spaces in the end
-  labels_string="${labels_string%"${labels_string##*[! ]}"}"
+  local common_path=$(common_path "${files_under_rules[@]}")
 
-  if [[ -n "$labels_string" ]]; then
-    scope="$labels_string"
-  fi
+  local label=""
+  local max_path_len=0
 
-  if [[ ${#matched_rules[@]} -eq 0 ]]; then
-    common_path=$(common_path "${changed_files_ref[@]}")
-    common_normalized=$(get_cut_path "$common_path" "$after_label_path_depth")
+  for path in "${!rules_ref[@]}"; do
 
-    if [[ -n "$common_normalized" ]]; then
-      scope="$common_normalized"
+    if [[ "$main_path" == "$path" ]]; then
+      continue
     fi
-  fi
 
-  # common path finding makes sense only if we have one matched rule
-  if [[ ${#matched_rules[@]} -eq 1 ]]; then
-    key_path="${!matched_rules[@]}"
-    common_path=$(common_path "${changed_files_ref[@]}")
-    common_stripped=$(strip_path_before "$common_path" "$key_path")
-    common_normalized=$(get_cut_path "$common_stripped" "$after_label_path_depth")
+    # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one with it label
+    if [[ "$common_path" == "$path" ]] || [[ "$common_path" == "$path/"* ]]; then
 
-    if [[ -n "$common_normalized" ]]; then
-      if [[ -n "$scope" ]]; then
-        scope="$scope $common_normalized"
-      else
-        scope="$common_normalized"
+      len=${#path}
+
+      if (( len > max_path_len )); then
+        label="${rules_ref[$path]}"
+        max_path_len=$len
       fi
+
+    fi
+  done
+
+  local scope=
+
+  if [[ -n "$common_path" ]]; then
+    scope="$main_label"
+
+    if [[ -n "$label" ]]; then
+      scope="$scope $label"
+    else
+      common_stripped=$(strip_path_before "$common_path" "$main_path")
+      common_normalized=$(get_cut_path "$common_stripped" "$no_label_path_depth")
+      scope="$scope $common_normalized"
     fi
   fi
 
-  if [[ -n "$scope" ]]; then
-    echo "($scope):"
-  else
-    echo "$scope"
+  scope="${scope# }"
+  scope="${scope% }"
+
+  changed_files_ref_ref=("${remaining_files[@]}")
+  scope_ref="$scope"
+}
+
+# test me
+make_general_scope() {
+  local -n changed_files_ref=$1
+  local no_label_path_depth=$2
+  shift 2
+
+  local general_scope=
+
+  for rules_group in "$@"; do
+
+    scope=$(make_scope "$changed_files_ref" "$no_label_path_depth" rules_group)
+    general_scope="$general_scope, $scope"
+
+    general_scope="${general_scope#, }"
+    general_scope="${general_scope%, }"
+  done
+
+  if [[ -n "$general_scope" ]]; then
+        general_scope="($general_scope):"
   fi
+
+  echo "$general_scope"
 }
