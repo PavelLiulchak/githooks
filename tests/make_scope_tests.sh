@@ -458,3 +458,34 @@ echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
 echo "assert arrays: files expected_remaining_files"
 assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.18. Test make_scope: rule with not empty path but empty label"
+declare -A rules_group1=(
+    ['code']="dev"
+    ['code/Module1']="mod1"
+    ['code/Module2']="mod2"
+    ['code/Module3']="mod3"
+)
+no_label_path_depth=1
+
+files=("code/Module1/text1.java")
+expected_remaining_files=()
+
+echo "rules_group1:"
+echo_assoc_array rules_group1
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules_group1
+expect="dev mod1"
+echo "make_scope files $no_label_path_depth res rules_group1"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files

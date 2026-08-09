@@ -115,24 +115,24 @@ path_into_linux_path() {
 }
 
 array_keys_to_linux_paths_without_trailing_slashes() {
-    local -n rules_ref_ref=$1
+    local -n rules_ref_ref_ref=$1
     local -A normalized
     local original_key normalized_key
 
-    for original_key in "${!rules_ref_ref[@]}"; do
+    for original_key in "${!rules_ref_ref_ref[@]}"; do
       normalized_key=$(path_into_linux_path "$original_key")
 
       while [[ "$normalized_key" == */ ]]; do
         normalized_key="${normalized_key%/}"
       done
 
-      normalized["$normalized_key"]="${rules_ref_ref[$original_key]}"
+      normalized["$normalized_key"]="${rules_ref_ref_ref[$original_key]}"
     done
 
-    rules_ref_ref=()
+    rules_ref_ref_ref=()
 
     for key in "${!normalized[@]}"; do
-        rules_ref_ref["$key"]="${normalized[$key]}"
+        rules_ref_ref_ref["$key"]="${normalized[$key]}"
     done
 }
 
@@ -215,14 +215,15 @@ get_entry_with_shortest_key() {
 make_scope() {
   local -n changed_files_ref_ref=$1
   local no_label_path_depth=$2
+  # be careful with the referenced variable name (see below)
   local -n scope_ref=$3
-  local -n rules_ref=$4
+  local -n rules_ref_ref=$4
 
-  array_keys_to_linux_paths_without_trailing_slashes rules_ref
+  array_keys_to_linux_paths_without_trailing_slashes rules_ref_ref
 
   local main_path=
   local main_label=
-  get_entry_with_shortest_key rules_ref main_path main_label
+  get_entry_with_shortest_key rules_ref_ref main_path main_label
 
   local -a files_under_rules=()
   local -a remaining_files=()
@@ -240,7 +241,7 @@ make_scope() {
   local label=""
   local max_path_len=0
 
-  for path in "${!rules_ref[@]}"; do
+  for path in "${!rules_ref_ref[@]}"; do
 
     if [[ "$main_path" == "$path" ]]; then
       continue
@@ -252,54 +253,69 @@ make_scope() {
       len=${#path}
 
       if (( len > max_path_len )); then
-        label="${rules_ref[$path]}"
+        label="${rules_ref_ref[$path]}"
         max_path_len=$len
       fi
 
     fi
   done
 
-  local scope=
+  # be careful with the referenced variable name
+  local scope_local=
 
   if [[ -n "$common_path" ]]; then
-    scope="$main_label"
+    scope_local="$main_label"
 
     if [[ -n "$label" ]]; then
-      scope="$scope $label"
+      scope_local="$scope_local $label"
     else
       common_stripped=$(strip_path_before "$common_path" "$main_path")
       common_normalized=$(get_cut_path "$common_stripped" "$no_label_path_depth")
-      scope="$scope $common_normalized"
+      scope_local="$scope_local $common_normalized"
     fi
   fi
 
-  scope="${scope# }"
-  scope="${scope% }"
+  scope_local="${scope_local# }"
+  scope_local="${scope_local% }"
 
   changed_files_ref_ref=("${remaining_files[@]}")
-  scope_ref="$scope"
+  scope_ref="$scope_local"
 }
 
-# test me
 make_general_scope() {
   local -n changed_files_ref=$1
   local no_label_path_depth=$2
-  shift 2
+  local -n general_scope_ref=$3
+  shift 3
 
-  local general_scope=
+  local general_scope_local=
+  local group_scope=
 
-  for rules_group in "$@"; do
+  for rules_ref in "$@"; do
+    make_scope changed_files_ref $no_label_path_depth group_scope $rules_ref
 
-    scope=$(make_scope "$changed_files_ref" "$no_label_path_depth" rules_group)
-    general_scope="$general_scope, $scope"
+    general_scope_local="$general_scope_local, $group_scope"
 
-    general_scope="${general_scope#, }"
-    general_scope="${general_scope%, }"
+    general_scope_local="${general_scope_local#, }"
+    general_scope_local="${general_scope_local%, }"
   done
 
-  if [[ -n "$general_scope" ]]; then
-        general_scope="($general_scope):"
+  if [[ -n "$general_scope_local" ]]; then
+
+    if [[ ${#changed_files_ref[@]} -gt 0 ]]; then
+      general_scope_local="${general_scope_local}, etc"
+    fi
+
+    general_scope_local="($general_scope_local):"
+  else
+
+    local common_path=$(common_path "${changed_files_ref[@]}")
+    common_normalized=$(get_cut_path "$common_path" "$no_label_path_depth")
+
+     if [[ -n "$common_normalized" ]]; then
+      general_scope_local="($common_normalized):"
+     fi
   fi
 
-  echo "$general_scope"
+  general_scope_ref="$general_scope_local"
 }
