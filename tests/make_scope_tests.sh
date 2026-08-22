@@ -340,7 +340,7 @@ echo_assoc_array rules
 
 echo ""
 echo "files: '${files[@]}'"
-echo "expected_remaining_files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
 res=
@@ -367,7 +367,7 @@ echo_assoc_array rules
 
 echo ""
 echo "files: '${files[@]}'"
-echo "expected_remaining_files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
 res=
@@ -394,7 +394,7 @@ echo_assoc_array rules
 
 echo ""
 echo "files: '${files[@]}'"
-echo "expected_remaining_files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
 res=
@@ -420,7 +420,7 @@ echo_assoc_array rules
 
 echo ""
 echo "files: '${files[@]}'"
-echo "expected_remaining_files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
 res=
@@ -448,7 +448,7 @@ echo_assoc_array rules
 
 echo ""
 echo "files: '${files[@]}'"
-echo "expected_remaining_files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
 res=
@@ -479,7 +479,7 @@ echo_assoc_array rules_group1
 
 echo ""
 echo "files: '${files[@]}'"
-echo "expected_remaining_files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 
 echo ""
 res=
