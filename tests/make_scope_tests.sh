@@ -465,7 +465,7 @@ echo ""
 echo "3.18. Test make_scope: rule with not empty path but empty label"
 declare -A rules_group1=(
     ['code']="dev"
-    ['code/Module1']="mod1"
+    ['code/Module1']="" # if no label, common path should be found
     ['code/Module2']="mod2"
     ['code/Module3']="mod3"
 )
@@ -484,7 +484,38 @@ echo "expected_remaining_files: '${files[@]}'"
 echo ""
 res=
 make_scope files $no_label_path_depth res rules_group1
-expect="dev mod1"
+expect="dev Module1"
+echo "make_scope files $no_label_path_depth res rules_group1"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.19. Test make_scope: spaces in key and path"
+declare -A rules_group1=(
+    ['code']="dev"
+    ['code/Module and components']="mod&comp"
+    ['code/Module2']="mod2"
+    ['code/Module3']="mod3"
+)
+no_label_path_depth=1
+
+files=("code/Module and components/text.java")
+expected_remaining_files=()
+
+echo "rules_group1:"
+echo_assoc_array rules_group1
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules_group1
+expect="dev mod&comp"
 echo "make_scope files $no_label_path_depth res rules_group1"
 assert "$res" "$expect"
 echo "assert arrays: files expected_remaining_files"
