@@ -121,3 +121,30 @@ echo ""
 array_keys_to_linux_paths_without_trailing_slashes actual
 
 assert_assoc_array_equals actual expected
+
+
+#########################################
+echo ""
+echo "2.5. Test array_keys_to_linux_paths_without_trailing_slashes, Mixed paths + Cyrrilic"
+declare -A actual=(
+    ['код\']="КОД"
+    ['код/тесты/']="КУА"
+    ['код\автотесты']="КУА"
+)
+
+declare -A expected=(
+    ['код']="КОД"
+    ['код/тесты']="КУА"
+    ['код/автотесты']="КУА"
+)
+
+echo "actual:"
+echo_assoc_array actual
+echo ""
+echo "expected:"
+echo_assoc_array expected
+echo ""
+
+array_keys_to_linux_paths_without_trailing_slashes actual
+
+assert_assoc_array_equals actual expected

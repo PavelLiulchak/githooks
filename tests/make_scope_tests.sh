@@ -520,3 +520,34 @@ echo "make_scope files $no_label_path_depth res rules_group1"
 assert "$res" "$expect"
 echo "assert arrays: files expected_remaining_files"
 assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.20. Test make_scope: Cyrillic"
+declare -A rules_group1=(
+    ['код']="код"
+    ['код/Модуль и компоненты']="Мод и Комп"
+    ['код/Модуль2']="Мод2"
+    ['код/Модуль3']="Мод3"
+)
+no_label_path_depth=1
+
+files=("код/Модуль и компоненты/text.java")
+expected_remaining_files=()
+
+echo "rules_group1:"
+echo_assoc_array rules_group1
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules_group1
+expect="код Мод и Комп"
+echo "make_scope files $no_label_path_depth res rules_group1"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files

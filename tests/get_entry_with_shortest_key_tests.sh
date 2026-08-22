@@ -81,3 +81,26 @@ echo "main_path:"
 assert "$main_path" ""
 echo "main_label:"
 assert "$main_label" ""
+
+
+#########################################
+declare -A rules=(
+    ['код']="код"
+    ['код/Модуль и компоненты']="мод1"
+    ['код/Модуль2']="мод2"
+    ['код/Модуль3']="мод3"
+)
+
+echo ""
+echo "9.4. Test get_entry_with_shortest_key, cyrillic rules"
+echo "rules:"
+echo_assoc_array rules
+
+main_path=
+main_label=
+get_entry_with_shortest_key rules main_path main_label
+
+echo "main_path:"
+assert "$main_path" "код"
+echo "main_label:"
+assert "$main_label" "код"

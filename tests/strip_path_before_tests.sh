@@ -85,3 +85,14 @@ expect="Dir3/Dir4"
 res=$(strip_path_before "$path" "$dir")
 echo "strip_path_before \"$path\" \"$dir\""
 assert "$res" "$expect"
+
+
+#########################################
+echo ""
+echo "4.7. Test strip_path_before, space in the path and cyrillic"
+path="код/Директория 1/Дир2/Дир3/Дир4"
+dir="код/Директория 1/Дир2/"
+expect="Дир3/Дир4"
+res=$(strip_path_before "$path" "$dir")
+echo "strip_path_before \"$path\" \"$dir\""
+assert "$res" "$expect"

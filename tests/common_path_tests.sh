@@ -162,3 +162,14 @@ expect="source dir/dir"
 res=$(common_path "$arg1" "$arg2")
 echo "common_path \"$arg1\" \"$arg2\""
 assert "$res" "$expect"
+
+
+#########################################
+echo ""
+echo "1.14. Test common_path: cyrillic paths"
+arg1="Исходная Директория/Директория/Поддиректория1"
+arg2="Исходная Директория/Директория/Поддиректория2"
+expect="Исходная Директория/Директория"
+res=$(common_path "$arg1" "$arg2")
+echo "common_path \"$arg1\" \"$arg2\""
+assert "$res" "$expect"
