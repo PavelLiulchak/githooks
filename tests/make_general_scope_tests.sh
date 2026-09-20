@@ -53,6 +53,8 @@ echo_assoc_array rules_group2
 echo "group3:"
 echo_assoc_array rules_group3
 
+
+#########################################
 echo ""
 echo "10.1. Test make_scope: (dev mod1), one rules array is passed as argument"
 
@@ -69,6 +71,7 @@ expect="(dev mod1):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.2. Test make_scope: (qa mod1), all rules arrays are passed as arguments"
 
@@ -85,6 +88,7 @@ expect="(qa mod1):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.3. Test make_scope: (qa, qa_ui, dev)"
 
@@ -102,6 +106,7 @@ expect="(qa, qa_ui, dev):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.4. Test make_scope: (qa mod1, qa_ui mod1, dev mod1)"
 
@@ -118,6 +123,7 @@ expect="(qa mod1, qa_ui mod1, dev mod1):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.5. Test make_scope: unlabled dir appears in scope"
 
@@ -135,6 +141,7 @@ expect="(qa text2.java, dev dir1):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.6. Test make_scope: etc appears in the scope when unlabled change appears"
 
@@ -152,6 +159,7 @@ expect="(qa mod1, qa_ui Dir1, dev, etc):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.7. Test make_scope: common path of unlabled changes appears"
 
@@ -168,6 +176,7 @@ expect="(python-src):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.8. Test make_scope: no common changes, scope is empty"
 
@@ -184,6 +193,7 @@ expect=""
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.9. Test make_scope: files are empty, scope is empty"
 
@@ -200,6 +210,7 @@ expect=""
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.10. Test make_scope: there is no rules, scope is built as common path"
 
@@ -216,6 +227,7 @@ expect="(python-src):"
 assert "$general_scope" "$expect"
 
 
+#########################################
 echo ""
 echo "10.11. Test make_scope: scope is built as common path, no_label_path_depth = 2"
 no_label_path_depth=2
@@ -234,6 +246,7 @@ assert "$general_scope" "$expect"
 no_label_path_depth=1
 
 
+#########################################
 echo ""
 echo "10.12. Test make_scope: scope is built as common path, no_label_path_depth = 2"
 no_label_path_depth=2
