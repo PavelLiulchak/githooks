@@ -263,3 +263,45 @@ expect="(qa_ui Dir1/SubDir1, etc):"
 
 assert "$general_scope" "$expect"
 no_label_path_depth=1
+
+
+declare -A rules_group1=(
+    ['.']=""
+    ['Module1']="mod1"
+    ['Module2']="mod2"
+    ['Module3']="mod3"
+)
+
+
+#########################################
+echo ""
+echo "10.13. Test make_general_scope: top level, main rule is empty"
+
+files=("Module1/submodule1/Dir1/SubDir1/text1.java" "Module1/submodule1.1/Dir2/SubDir2/text2.java")
+general_scope=
+
+echo ""
+echo "files: '${files[@]}'"
+
+echo ""
+make_general_scope files $no_label_path_depth general_scope rules_group1
+expect="(mod1):"
+
+assert "$general_scope" "$expect"
+
+
+#########################################
+echo ""
+echo "10.14. Test make_general_scope: top level, main rule is empty, empty scope due to no intersection"
+
+files=("Module1/submodule1/Dir1/SubDir1/text1.java" "Module2/submodule2/Dir2/SubDir2/text2.java")
+general_scope=
+
+echo ""
+echo "files: '${files[@]}'"
+
+echo ""
+make_general_scope files $no_label_path_depth general_scope rules_group1
+expect=""
+
+assert "$general_scope" "$expect"
