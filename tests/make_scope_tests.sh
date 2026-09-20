@@ -509,10 +509,11 @@ assert_array_equals files expected_remaining_files
 
 
 #########################################
+# When a team works within own single directory
 echo ""
-echo "3.20. Test make_scope: main rule is empty, all changes are under one sublabel"
+echo "3.20. Test make_scope: top level, main rule is empty"
 declare -A rules=(
-    ['']=""
+    ['.']=""
     ['Module1']="mod1"
     ['Module2']="mod2"
 )
@@ -539,7 +540,115 @@ assert_array_equals files expected_remaining_files
 
 #########################################
 echo ""
-echo "3.**. Test make_scope: rule with not empty path but empty label"
+echo "3.21. Test make_scope: top level, main rule is empty"
+
+files=("dir/subdir/test.cs" "dir/subdir2/test2.cs")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="dir"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.22. Test make_scope: top level, main rule is empty, empty scope due to no submodules intersection"
+
+files=("Module1/SubModule1/text1.java" "Module2/SubModule2/text2.java" "dir/subdir/test.cs")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect=""
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+echo ""
+echo "3.23. Test make_scope: top level, main rule is empty"
+declare -A rules=(
+    ['.']=""
+    ['Module1']="mod1"
+    ['Module1/SubModule1']="mod1-submod1"
+    ['Module1/SubModule1.2']="mod1-submod1.2"
+    ['Module2']="mod2"
+)
+
+files=("Module1/SubModule1/text1.java" "Module1/SubModule1.2/text2.java")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="mod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+echo ""
+echo "3.24. Test make_scope: top level, main rule is empty"
+declare -A rules=(
+    ['.']=""
+    ['Module1']="mod1"
+    ['Module1/SubModule1']="mod1-submod1"
+    ['Module1/SubModule1.2']="mod1-submod1.2"
+    ['Module2']="mod2"
+)
+
+files=("Module1/SubModule1/text1.java" "Module1/SubModule1/text2.java")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="mod1-submod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.25. Test make_scope: rule with not empty path but empty label"
 declare -A rules_group1=(
     ['code']="dev"
     ['code/Module1']="" # if no label, common path should be found
@@ -570,7 +679,7 @@ assert_array_equals files expected_remaining_files
 
 #########################################
 echo ""
-echo "3.**. Test make_scope: spaces in key and path"
+echo "3.26. Test make_scope: spaces in key and path"
 declare -A rules_group1=(
     ['code']="dev"
     ['code/Module and components']="mod&comp"
@@ -601,7 +710,7 @@ assert_array_equals files expected_remaining_files
 
 #########################################
 echo ""
-echo "3.**. Test make_scope: Cyrillic"
+echo "3.27. Test make_scope: Cyrillic"
 declare -A rules_group1=(
     ['код']="код"
     ['код/Модуль и компоненты']="Мод и Комп"

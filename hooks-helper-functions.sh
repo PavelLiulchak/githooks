@@ -219,6 +219,8 @@ make_scope() {
   local -n scope_ref=$3
   local -n rules_ref_ref=$4
 
+  local root_dir_path_sign="."
+
   array_keys_to_linux_paths_without_trailing_slashes rules_ref_ref
 
   local main_path=
@@ -229,7 +231,7 @@ make_scope() {
   local -a remaining_files=()
 
   for file in "${changed_files_ref_ref[@]}"; do
-    if [[ "$file" == "$main_path" ]] || [[ "$file" == "$main_path/"* ]]; then
+    if [[ "$file" == "$main_path" ]] || [[ "$file" == "$main_path/"* ]] || [[ "$main_path" == "$root_dir_path_sign" ]]; then
       files_under_rules+=("$file")
     else
       remaining_files+=("$file")
