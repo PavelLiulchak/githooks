@@ -433,11 +433,12 @@ assert_array_equals files expected_remaining_files
 
 
 #########################################
-# Empty labels work but it is not advised to use them, the approach may create confusing scopes.
 echo ""
-echo "3.17. Test make_scope: rule with not empty path but empty label"
+echo "3.17. Test make_scope: main rule is empty, all changes are under one sublabel"
 declare -A rules=(
     ['code']=""
+    ['code/Module1']="mod1"
+    ['code/Module2']="mod2"
 )
 
 files=("code/Module1/SubModule1/text1.java" "code/Module1/SubModule1/text2.java")
@@ -453,7 +454,30 @@ echo "expected_remaining_files: '${expected_remaining_files[@]}'"
 echo ""
 res=
 make_scope files $no_label_path_depth res rules
-expect="Module1"
+expect="mod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+#########################################
+echo ""
+echo "3.18. Test make_scope: main rule is empty, empty scope due to no submodules intersection"
+
+files=("code/Module1/SubModule1/text1.java" "code/Module2/SubModule2/text2.java" "code/tests/test.cs")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect=""
 echo "make_scope files $no_label_path_depth res rules"
 assert "$res" "$expect"
 echo "assert arrays: files expected_remaining_files"
@@ -462,7 +486,60 @@ assert_array_equals files expected_remaining_files
 
 #########################################
 echo ""
-echo "3.18. Test make_scope: rule with not empty path but empty label"
+echo "3.19. Test make_scope: main rule is empty, empty scope due to no submodules intersection, one file is out of rules"
+
+files=("code/Module1/SubModule1/text1.java" "code/Module2/SubModule2/text2.java" "dir/subdir/test.cs")
+expected_remaining_files=("dir/subdir/test.cs")
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect=""
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.20. Test make_scope: main rule is empty, all changes are under one sublabel"
+declare -A rules=(
+    ['']=""
+    ['Module1']="mod1"
+    ['Module2']="mod2"
+)
+
+files=("Module1/SubModule1/text1.java" "Module1/SubModule1/text2.java")
+expected_remaining_files=()
+
+echo "rules:"
+echo_assoc_array rules
+
+echo ""
+echo "files: '${files[@]}'"
+echo "expected_remaining_files: '${expected_remaining_files[@]}'"
+
+echo ""
+res=
+make_scope files $no_label_path_depth res rules
+expect="mod1"
+echo "make_scope files $no_label_path_depth res rules"
+assert "$res" "$expect"
+echo "assert arrays: files expected_remaining_files"
+assert_array_equals files expected_remaining_files
+
+
+#########################################
+echo ""
+echo "3.**. Test make_scope: rule with not empty path but empty label"
 declare -A rules_group1=(
     ['code']="dev"
     ['code/Module1']="" # if no label, common path should be found
@@ -493,7 +570,7 @@ assert_array_equals files expected_remaining_files
 
 #########################################
 echo ""
-echo "3.19. Test make_scope: spaces in key and path"
+echo "3.**. Test make_scope: spaces in key and path"
 declare -A rules_group1=(
     ['code']="dev"
     ['code/Module and components']="mod&comp"
@@ -524,7 +601,7 @@ assert_array_equals files expected_remaining_files
 
 #########################################
 echo ""
-echo "3.20. Test make_scope: Cyrillic"
+echo "3.**. Test make_scope: Cyrillic"
 declare -A rules_group1=(
     ['код']="код"
     ['код/Модуль и компоненты']="Мод и Комп"
