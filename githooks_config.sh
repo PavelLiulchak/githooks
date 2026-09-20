@@ -26,8 +26,8 @@ declare -A team2_rules=(
 )
 
 declare team3_main_label="dev"
-declare -A team2_rules=(
-    ['code']="$team2_main_label"
+declare -A team3_rules=(
+    ['code']="$team3_main_label"
     ['code/Module1']="mod1"
     ['code/Module2']="mod2"
     ['code/Module3']="mod3"
