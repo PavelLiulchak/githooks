@@ -50,9 +50,9 @@ branch=$(git branch --show-current)
 jira_id=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 
 {
-    echo "$scope <write your summary>"
+    echo "$scope"
     echo ""
-    echo "<write your body>"
+    echo ""
     echo ""
     if [ -n "$jira_id" ]; then
       echo "$jira_id"
