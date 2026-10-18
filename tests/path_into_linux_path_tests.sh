@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Copyright 2026 Pavel Liulchak
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
@@ -31,6 +45,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.2. Test path_into_linux_path: path with space"
 arg="C:\Users\Test User\My Project\src"
@@ -40,6 +55,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.3. Test path_into_linux_path: linux path"
 arg="/home/user/project/src"
@@ -49,6 +65,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.4. Test path_into_linux_path: mixed path"
 arg="C:\Users/Test\project/src"
@@ -58,6 +75,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.5. Test path_into_linux_path: Windows drive root"
 arg="C:\\"
@@ -67,6 +85,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.6. Test path_into_linux_path: single slash"
 arg="\\"
@@ -76,6 +95,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.7. Test path_into_linux_path: empty arg"
 arg=""
@@ -85,6 +105,7 @@ echo "path_into_linux_path \"$arg\""
 assert "$res" "$expect"
 
 
+#########################################
 echo ""
 echo "0.8. Test path_into_linux_path: spec symbols"
 arg="C:\Users\Test\foo-bar_123.txt"

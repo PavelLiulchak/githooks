@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# Copyright 2026 Pavel Liulchak
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+pushd "$(dirname "$(which "$0")")" >/dev/null
+script_dir="$(pwd -P)"
+popd >/dev/null
+
+helper_functions_script="$script_dir/../hooks-helper-functions.sh"
+if [[ ! -f "$helper_functions_script" ]]; then
+echo "$helper_functions_script is not found, nothing to source, exiting..."
+exit 1
+fi
+source $helper_functions_script
+
+helper_tests_script="$script_dir/helpers_tests.sh"
+if [[ ! -f "$helper_tests_script" ]]; then
+echo "$helper_tests_script is not found, nothing to source, exiting..."
+exit 1
+fi
+source $helper_tests_script
+
+## tests
+echo ""
+echo "5. get_cut_path"
+
+echo ""
+echo "5.1. Test get_cut_path, depth = 0"
+path="source_dir/dir/sub dir"
+depth=0
+expect=""
+res=$(get_cut_path "$path" "$depth")
+echo "get_cut_path \"$path\" \"$depth\""
+assert "$res" "$expect"
+
+
+#########################################
+echo ""
+echo "5.2. Test get_cut_path, depth = 1"
+path="source_dir/dir/sub dir"
+depth=1
+expect="source_dir"
+res=$(get_cut_path "$path" "$depth")
+echo "get_cut_path \"$path\" \"$depth\""
+assert "$res" "$expect"
+
+
+#########################################
+echo ""
+echo "5.3. Test get_cut_path, depth = 1, cyrillic"
+path="исходная директория/директория/поддиректория"
+depth=1
+expect="исходная директория"
+res=$(get_cut_path "$path" "$depth")
+echo "get_cut_path \"$path\" \"$depth\""
+assert "$res" "$expect"
+
+
+#########################################
+echo ""
+echo "5.4. Test get_cut_path, depth is equal to amount of directory components"
+path="source_dir/dir/sub dir"
+depth=3
+res=$(get_cut_path "$path" "$depth")
+echo "get_cut_path \"$path\" \"$depth\""
+assert "$res" "$path"
+
+
+#########################################
+echo ""
+echo "5.5. Test get_cut_path, depth is greater than amount of directory components"
+path="source_dir/dir/sub dir"
+depth=10
+res=$(get_cut_path "$path" "$depth")
+echo "get_cut_path \"$path\" \"$depth\""
+assert "$res" "$path"

@@ -1,14 +1,24 @@
 #!/bin/bash
 
+# Copyright 2026 Pavel Liulchak
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 pushd "$(dirname "$(which "$0")")" >/dev/null
 script_dir="$(pwd -P)"
 popd >/dev/null
 
-DEV_DIR="code"
-QA_DIR="tests"
-JIRA_PROJECT_KEY="PROJ"
-
-COMMIT_MSG_FILE=$1
+commit_msg_file=$1
 
 helper_functions_script="$script_dir/hooks-helper-functions.sh"
 
@@ -17,7 +27,16 @@ echo "$helper_functions_script is not found, nothing to source, exiting..."
 exit 1
 fi
 
-source $helper_functions_script
+source "$helper_functions_script"
+
+githooks_config_script="$script_dir/githooks_config.sh"
+
+if [[ ! -f "$githooks_config_script" ]]; then
+    echo "Config $githooks_config_script is not found, nothing to source, exiting..."
+    exit 1
+fi
+
+source "$githooks_config_script"
 
 commit_message_has_real_content() {
   awk '
@@ -28,7 +47,7 @@ commit_message_has_real_content() {
 }
 
 # avoid exisitng commit message rewriting, helpful in case of ammends, cherry-picks
-if commit_message_has_real_content "$COMMIT_MSG_FILE"; then
+if commit_message_has_real_content "$commit_msg_file"; then
   exit 0
 fi
 
@@ -36,26 +55,20 @@ if git rev-parse -q --verify MERGE_HEAD >/dev/null; then
   exit 0
 fi
 
-mapfile -d '' -t FILES < <(git diff --cached --name-only -z)
-COMMON=$(common_path "${FILES[@]}")
+mapfile -d '' -t files < <(git diff --cached --name-only -z)
 
-# I do this due to the project specific: QA_DIR - is a subdir of DEV_DIR.
-# You may use only normalization if they are located on the same level
-COMMON_STRIPPED=$(strip_path_before "$COMMON" "$QA_DIR")
-
-COMMON_NORMALIZED=$(normalize_path "$COMMON_STRIPPED")
-SCOPE=$(make_scope $COMMON_NORMALIZED $DEV_DIR $QA_DIR)
+make_general_scope files $path_depth scope team1_rules team2_rules
 
 # Jira ID
-BRANCH=$(git branch --show-current)
-JIRAID=$(get_jira_id_from_branch_name "$BRANCH" "$JIRA_PROJECT_KEY")
+branch=$(git branch --show-current)
+jira_id=$(get_jira_id_from_branch_name "$branch" "$jira_project_key")
 
 {
-    echo "$SCOPE: <write your summary>"
+    echo "$scope"
     echo ""
-    echo "<write your body>"
     echo ""
-    if [ -n "$JIRAID" ]; then
-      echo "$JIRAID"
+    echo ""
+    if [ -n "$jira_id" ]; then
+      echo "$jira_id"
     fi
-} > "$COMMIT_MSG_FILE"
+} > "$commit_msg_file"

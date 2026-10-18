@@ -1,5 +1,19 @@
 #!/bin/bash
 
+# Copyright 2026 Pavel Liulchak
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 common_path() {
   local paths=()
 
@@ -33,71 +47,78 @@ common_path() {
 
 # strips subpath to $2
 strip_path_before() {
-  local path="$1"
-  local dir="$2"
+    
+    path="$(path_into_linux_path "$1")"
+    prefix="$(path_into_linux_path "$2")"
+    
+    # delete arbitrary amount of trailing slashes
+    while [[ "$path" == */ ]]; do
+        path="${path%/}"
+    done
 
-  IFS='/' read -ra parts <<< "$path"
+    while [[ "$prefix" == */ ]]; do
+        prefix="${prefix%/}"
+    done
 
-  for i in "${!parts[@]}"; do
-    if [[ "${parts[i]}" == "$dir" ]]; then
-      echo "${parts[@]:i}" | tr ' ' '/'
-      return
+    case $path in
+        "$prefix")
+            echo
+            ;;
+        "$prefix"/*)
+            echo "${path#"$prefix"/}"
+            ;;
+        *)
+            echo "$path"
+            ;;
+    esac
+}
+
+get_cut_path() {
+    local path="$1"
+    local depth="$2"
+
+    if [[ ! "$depth" =~ ^[0-9]+$ ]]; then
+        echo "Error: depth must be a non-negative integer" >&2
+        return 1
     fi
-  done
 
-  echo "$path"
-}
+    while [[ "$path" == */ ]]; do
+        path="${path%/}"
+    done
 
-# Normalize to two dirs in the path
-normalize_path() {
-  IFS='/' read -r a b c <<< "$1"
-  if [ -z "$b" ]; then
-    echo "$a"
-  else
-    echo "$a/$b"
-  fi
-}
+    local IFS='/'
+    local -a parts
+    read -ra parts <<< "$path"
 
-make_scope() {
-  local path="$1"
-  local dev_dir="$2"
-  local qa_dir="$3"
+    local limit=$depth
+    (( limit > ${#parts[@]} )) && limit=${#parts[@]}
 
-  IFS='/' read -r root module <<< "$path"
+    local result=""
+    local i
 
-  case "$root" in
-    "$dev_dir")
-      if [ -n "$module" ]; then
-        echo "[DEV] $module"
-      else
-        echo "[DEV]"
-      fi
-      ;;
-    "$qa_dir")
-      if [ -n "$module" ]; then
-        echo "[QA] $module"
-      else
-        echo "[QA]"
-      fi
-      ;;
-    *)
-      echo ""
-      ;;
-  esac
+    for ((i = 0; i < limit; i++)); do
+        [[ -n "$result" ]] && result+="/"
+        result+="${parts[i]}"
+    done
+
+    echo "$result"
 }
 
 get_jira_id_from_branch_name() {
-    BRANCH=$1
-    JIRA_PROJECT_KEY=$2
+    local branch=$1
+    local jira_project_key=$2
+    local jiraid
 
-    JIRAID=$(echo "$BRANCH" \
-  | grep -oiE "$JIRA_PROJECT_KEY[-_]?[0-9]+" \
-  | head -n1 \
-  | tr '[:lower:]' '[:upper:]')
+    jiraid=$(echo "$branch" \
+        | grep -oiE "${jira_project_key}[-_]*[0-9]+" \
+        | head -n1 \
+        | tr '[:lower:]' '[:upper:]')
 
-[ -n "$JIRAID" ] && JIRAID=$(echo "$JIRAID" | sed -E "s/${JIRA_PROJECT_KEY}[-_]?([0-9]+)/${JIRA_PROJECT_KEY}-\1/")
+    if [[ -n "$jiraid" ]]; then
+        jiraid=$(echo "$jiraid" | sed -E "s/${jira_project_key}[-_]*([0-9]+)/${jira_project_key}-\1/")
+    fi
 
-echo "$JIRAID"
+    echo "$jiraid"
 }
 
 path_into_linux_path() {
@@ -105,4 +126,212 @@ path_into_linux_path() {
   path="${path//\\//}"
 
   echo "$path"
+}
+
+array_keys_to_linux_paths_without_trailing_slashes() {
+    local -n rules_ref_ref_ref=$1
+    local -A normalized
+    local original_key normalized_key
+
+    for original_key in "${!rules_ref_ref_ref[@]}"; do
+      normalized_key=$(path_into_linux_path "$original_key")
+
+      while [[ "$normalized_key" == */ ]]; do
+        normalized_key="${normalized_key%/}"
+      done
+
+      normalized["$normalized_key"]="${rules_ref_ref_ref[$original_key]}"
+    done
+
+    rules_ref_ref_ref=()
+
+    for key in "${!normalized[@]}"; do
+        rules_ref_ref_ref["$key"]="${normalized[$key]}"
+    done
+}
+
+# check me and test
+strip_scope_and_path() {
+    local msg=$1
+    local scope=$2
+
+    if [[ -z "$scope" ]]; then
+        echo "$msg"
+        return
+    fi
+
+    case "$msg" in
+        "$scope "*)
+            echo "${msg#"$scope "}"
+            ;;
+        "$scope"*)
+            echo "${msg#"$scope"}"
+            ;;
+        *)
+            echo "$msg"
+            ;;
+    esac
+}
+
+replace_scope() {
+    local text="$1"
+    local replacement="$2"
+
+    text="${text/\(*\):/$replacement}"
+
+    text="${text#"${text%%[![:space:]]*}"}"
+
+    echo "$text"
+}
+
+# test me, delete me?
+deduplicate_specific_label() {
+    local -n arr=$1
+    local label=$2
+
+    local found=false
+    local -a result=()
+
+    for item in "${arr[@]}"; do
+        if [[ "$item" == "$label" ]]; then
+            if ! $found; then
+                result+=("$item")
+                found=true
+            fi
+        else
+            result+=("$item")
+        fi
+    done
+
+    arr=("${result[@]}")
+}
+
+
+get_entry_with_shortest_key() {
+    local -n map=$1
+    local -n key_ref=$2
+    local -n value_ref=$3
+
+    key_ref=
+    value_ref=
+
+    local key
+
+    for key in "${!map[@]}"; do
+        if [[ -z $key_ref || ${#key} -lt ${#key_ref} ]]; then
+            key_ref=$key
+            value_ref=${map[$key]}
+        fi
+    done
+}
+
+
+make_scope() {
+  local -n changed_files_ref_ref=$1
+  local no_label_path_depth=$2
+  # be careful with the referenced variable name (see below)
+  local -n scope_ref=$3
+  local -n rules_ref_ref=$4
+
+  local root_dir_path_sign="."
+
+  array_keys_to_linux_paths_without_trailing_slashes rules_ref_ref
+
+  local main_path=
+  local main_label=
+  get_entry_with_shortest_key rules_ref_ref main_path main_label
+
+  local -a files_under_rules=()
+  local -a remaining_files=()
+
+  for file in "${changed_files_ref_ref[@]}"; do
+    if [[ "$file" == "$main_path" ]] || [[ "$file" == "$main_path/"* ]] || [[ "$main_path" == "$root_dir_path_sign" ]]; then
+      files_under_rules+=("$file")
+    else
+      remaining_files+=("$file")
+    fi
+  done
+
+  local common_path=$(common_path "${files_under_rules[@]}")
+
+  local label=""
+  local max_path_len=0
+
+  for path in "${!rules_ref_ref[@]}"; do
+
+    if [[ "$main_path" == "$path" ]]; then
+      continue
+    fi
+
+    # to account for nested label cases (dir1 and dir1/subdir1), we take the longest one with it label
+    if [[ "$common_path" == "$path" ]] || [[ "$common_path" == "$path/"* ]]; then
+
+      len=${#path}
+
+      if (( len > max_path_len )); then
+        label="${rules_ref_ref[$path]}"
+        max_path_len=$len
+      fi
+
+    fi
+  done
+
+  # be careful with the referenced variable name
+  local scope_local=
+
+  if [[ -n "$common_path" ]]; then
+    scope_local="$main_label"
+
+    if [[ -n "$label" ]]; then
+      scope_local="$scope_local $label"
+    else
+      common_stripped=$(strip_path_before "$common_path" "$main_path")
+      common_normalized=$(get_cut_path "$common_stripped" "$no_label_path_depth")
+      scope_local="$scope_local $common_normalized"
+    fi
+  fi
+
+  scope_local="${scope_local# }"
+  scope_local="${scope_local% }"
+
+  changed_files_ref_ref=("${remaining_files[@]}")
+  scope_ref="$scope_local"
+}
+
+make_general_scope() {
+  local -n changed_files_ref=$1
+  local no_label_path_depth=$2
+  local -n general_scope_ref=$3
+  shift 3
+
+  local general_scope_local=
+  local group_scope=
+
+  for rules_ref in "$@"; do
+    make_scope changed_files_ref $no_label_path_depth group_scope $rules_ref
+
+    general_scope_local="$general_scope_local, $group_scope"
+
+    general_scope_local="${general_scope_local#, }"
+    general_scope_local="${general_scope_local%, }"
+  done
+
+  if [[ -n "$general_scope_local" ]]; then
+
+    if [[ ${#changed_files_ref[@]} -gt 0 ]]; then
+      general_scope_local="${general_scope_local}, etc"
+    fi
+
+    general_scope_local="($general_scope_local):"
+  else
+
+    local common_path=$(common_path "${changed_files_ref[@]}")
+    common_normalized=$(get_cut_path "$common_path" "$no_label_path_depth")
+
+     if [[ -n "$common_normalized" ]]; then
+      general_scope_local="($common_normalized):"
+     fi
+  fi
+
+  general_scope_ref="$general_scope_local"
 }
