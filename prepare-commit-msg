@@ -43,7 +43,7 @@ fi
 
 mapfile -d '' -t files < <(git diff --cached --name-only -z)
 
-make_general_scope files $path_depth scope team1_rules team2_rules team3_rules
+make_general_scope files $path_depth scope team1_rules team2_rules
 
 # Jira ID
 branch=$(git branch --show-current)
