@@ -102,15 +102,13 @@ declare -A team2_rules=(
     ['code/Module2']="mod2"
 )
 ```
-2. Правим вызов метода `make_general_scope` в хуке `prepare-commit-msg`:
-```bash
-make_general_scope <do not touch other args> team1_rules team1_2rules team2_rules
-```
-Методу можно передать в качестве аргументов неограниченное число правил:
+2. Там же в `githooks_config.sh` добавляем в массив `all_rules` новую группу правил, отделяя между собой правила пробелами:
 
 ```bash
-make_general_scope <do not touch other args> team1_rules team2_rules ... teamN_rules
+all_rules=(team1_rules team1_2rules team2_rules)
 ```
+
+**ВАЖНО!** `all_rules` в дальнейшем будет передан в `make_general_scope`, поэтому не забываем про порядок правил, что упомянался выше: сначала специфичные директории, затем более общие.
 
 #### Если в репозитории работает только одна команда
 В таких случаях целесообразно в `scope` не указывать лейбл команды: это лишняя очевидная информация, поэтому в правилах значение нужно оставить пустым, а в ключе обозначить корневую директорию проекта точкой `'.'`:
@@ -121,6 +119,8 @@ declare -A team_rules=(
     ['Module1/Submodule']="mod1-sub"
     ['Module2']="mod2"
 )
+
+all_rules=(team_rules)
 ```
 В таком случае `scope` будет выглядеть компактнее `(mod1):` и при этом содержать подсказку, в каком логическом модуле произошли изменения.
 
